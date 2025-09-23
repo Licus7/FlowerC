@@ -303,7 +303,7 @@ class UserSystem {
             
             // 添加事件监听
             document.getElementById('continueBtn').addEventListener('click', () => {
-                window.location.href = 'work.html'；
+                window.location.href = 'work.html';
             });
             
             document.getElementById('logoutBtn').addEventListener('click', () => {
