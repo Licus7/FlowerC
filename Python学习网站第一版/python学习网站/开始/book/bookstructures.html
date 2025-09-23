@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教学课程 - 阶段学习</title>
+    <style>
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        
+        
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        #background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s ease;
+        }
+        
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+       
+        .stages-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        
+        .stage-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stage-card h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        
+        .stage-card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+        
+        .stage-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .stage-link:hover {
+            background-color: #2980b9;
+        }
+        
+       
+        .audio-control {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        
+        .audio-control:hover {
+            transform: scale(1.1);
+        }
+        
+        .audio-icon {
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+      
+        @media (max-width: 768px) {
+            .stages-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                margin: 15px;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .audio-control {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+   
+    <div id="background-container">
+        <img id="background-image" src="../../背景+音频/248665bb223983314c43349065982eb9.jpg" alt="教学背景">
+    </div>
+    
+ 
+    <div class="container">
+        <h1>课程学习阶段</h1>
+        
+        <div class="stages-container">
+         
+            <div class="stage-card">
+                <h2>阶段 1</h2>
+                <p>基础入门课程</p>
+                <a href="stage1.html" class="stage-link">开始学习</a>
+            </div>
+            
+      
+            <div class="stage-card">
+                <h2>阶段 2</h2>
+                <p>核心概念掌握</p>
+                <a href="stage2.html" class="stage-link">开始学习</a>
+            </div>
+            
+            
+            <div class="stage-card">
+                <h2>阶段 3</h2>
+                <p>实践应用基础</p>
+                <a href="stage3.html" class="stage-link">开始学习</a>
+            </div>
+            
+            
+            <div class="stage-card">
+                <h2>阶段 4</h2>
+                <p>进阶技能训练</p>
+                <a href="stage4.html" class="stage-link">开始学习</a>
+            </div>
+            
+            
+            <div class="stage-card">
+                <h2>阶段 5</h2>
+                <p>综合项目实践</p>
+                <a href="stage5.html" class="stage-link">开始学习</a>
+            </div>
+            
+          
+            <div class="stage-card">
+                <h2>阶段 6</h2>
+                <p>高级主题探索</p>
+                <a href="stage6.html" class="stage-link">开始学习</a>
+            </div>
+            
+          
+            <div class="stage-card">
+                <h2>阶段 7</h2>
+                <p>专业领域深入</p>
+                <a href="stage7.html" class="stage-link">开始学习</a>
+            </div>
+            
+           
+            <div class="stage-card">
+                <h2>阶段 8</h2>
+                <p>创新思维培养</p>
+                <a href="stage8.html" class="stage-link">开始学习</a>
+            </div>
+            
+           
+            <div class="stage-card">
+                <h2>阶段 9</h2>
+                <p>实战项目演练</p>
+                <a href="stage9.html" class="stage-link">开始学习</a>
+            </div>
+            
+           
+            <div class="stage-card">
+                <h2>阶段 10</h2>
+                <p>综合能力评估</p>
+                <a href="stage10.html" class="stage-link">开始学习</a>
+            </div>
+        </div>
+    </div>
+    
+
+    <div class="audio-control" id="audioControl">
+        <div class="audio-icon" id="audioIcon"></div>
+    </div>
+    
+
+    <audio id="backgroundAudio" loop>
+        <source src="../../背景+音频/浅夏晴空-玖九9#2CUNJ4.mp3" type="audio/mpeg">
+        您的浏览器不支持音频元素。
+    </audio>
+    
+    <script>
+      
+        const audioControl = document.getElementById('audioControl');
+        const audioIcon = document.getElementById('audioIcon');
+        const backgroundAudio = document.getElementById('backgroundAudio');
+        const backgroundImage = document.getElementById('background-image');
+        
+   
+        function setAudioIcon(isPlaying) {
+            audioIcon.style.backgroundImage = isPlaying 
+                ? 'url("../../背景+音频/6d6c7438e256469e6ff6d7425e93ea93.jpg")' 
+                : 'url("../../背景+音频/4875b8e21b85a482bbc8159257c9a9e8.png")';
+        }
+        
+   
+        let isAudioPlaying = false;
+        setAudioIcon(isAudioPlaying);
+        
+       
+        audioControl.addEventListener('click', function() {
+            if (isAudioPlaying) {
+                backgroundAudio.pause();
+            } else {
+                backgroundAudio.play().catch(e => {
+                    console.log("自动播放被阻止:", e);
+                });
+            }
+            isAudioPlaying = !isAudioPlaying;
+            setAudioIcon(isAudioPlaying);
+        });
+        
+
+        function changeBackground(imageUrl) {
+            backgroundImage.style.opacity = 0;
+            setTimeout(() => {
+                backgroundImage.src = imageUrl;
+                backgroundImage.style.opacity = 1;
+            }, 500);
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            backgroundAudio.volume = 0.5;
+            
+ 
+            const savedAudioState = localStorage.getItem('audioState');
+            if (savedAudioState === 'playing') {
+                audioControl.click(); 
+            }
+        });
+
+        window.addEventListener('beforeunload', function() {
+            localStorage.setItem('audioState', isAudioPlaying ? 'playing' : 'paused');
+        });
+    </script>
+</body>
+</html>

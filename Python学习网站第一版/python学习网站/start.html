@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pixelart 菜单</title>
+    
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/back_button.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('背景+音频/像素城市霓虹动图.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #logoutButton {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+        
+        .menu {
+            background-color: rgba(106, 13, 173, 0.7); 
+            padding: 30px 50px;
+            border-radius: 15px;
+            border: 3px solid #d9b3ff; 
+            box-shadow: 0 0 20px #8a2be2, 
+                        inset 0 0 15px rgba(255, 255, 255, 0.3); 
+            max-width: 600px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .btn-retro {
+            display: block;
+            padding: 12px 25px;
+            background-color: #6a0dad; 
+            color: #f0e6ff;
+            text-decoration: none;
+            border: 2px solid #d9b3ff;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: 3px 3px 0 #4b0082;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-retro:hover {
+            background-color: #8a2be2; 
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 #4b0082;
+        }
+        
+        #speaker {
+            margin-top: 20px;
+            cursor: pointer;
+            border: 2px solid #d9b3ff;
+            border-radius: 50%;
+            padding: 5px;
+            background-color: rgba(106, 13, 173, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        #speaker:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px #d9b3ff;
+        }
+        
+        @media (max-width: 600px) {
+            .menu {
+                width: 80%;
+                padding: 20px;
+            }
+            
+            .btn-retro {
+                padding: 10px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a id="logoutButton" class="small-retro music-retro"></a>
+    
+    <div class="menu">
+        <ul>
+            <li><a href="开始\examine.html" class="btn-retro">考核</a></li>
+            <li><a href="开始\bookstructures.html" class="btn-retro">课程</a></li>
+            <li><a href="开始\boss.html" class="btn-retro">boss</a></li>
+            <li><a href="开始\practice.html" class="btn-retro">练习</a></li>
+            <li>
+                <img id="speaker" onclick="play_music()" style="width: 40px; height: 40px;" src="像素城市霓虹动图.gif" alt="音乐控制">
+            </li>
+        </ul>
+    </div>
+
+    <audio id="music-player" loop>
+        <source src="浅夏晴空-玖九9#2CUNJ4.mp3" type="audio/mpeg">
+        您的浏览器不支持音频元素。
+    </audio>
+
+    <script src="../js/menu.js"></script>
+    <script src="../js/index.js"></script>
+    
+    <script>
+        function play_music() {
+            const player = document.getElementById('music-player');
+            const speaker = document.getElementById('speaker');
+            
+            if (player.paused) {
+                player.play();
+                speaker.src = "背景+音频/像素城市霓虹动图.gif"; 
+            } else {
+                player.pause();
+                speaker.src = "背景+音频/248665bb223983314c43349065982eb9.jpg";
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const player = document.getElementById('music-player');
+            player.volume = 0.5; 
+            
+            player.play().catch(e => {
+            });
+        });
+    </script>
+</body>
+</html>
