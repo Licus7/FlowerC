@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - 我们的团队</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d3b66 0%, #1e5c9e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .team-section {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .team-member {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            width: 260px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .team-member:hover {
+            transform: translateY(-5px);
+        }
+        
+        .member-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #64b5f6, #1976d2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            color: white;
+        }
+        
+        .member-name {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+        
+        .member-role {
+            color: #bbdefb;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+        
+        .resume-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 20px;
+            transition: background 0.3s ease;
+        }
+        
+        .resume-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .team-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .team-member {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>我们的团队</h1>
+            <p class="subtitle">我们是一支正在开发Python教学网站的团队，致力于创造优质的学习体验。</p>
+        </header>
+        
+        <div class="team-section">
+            <div class="team-member">
+                <div class="member-img">
+                    <span>李</span>
+                </div>
+                <h3 class="member-name">李佳浩</h3>
+                <p class="member-role">项目经理 & 内容编写</p>
+                <a href="../FlowerC/李佳浩简介设计1/李佳浩个人简介.html" class="resume-link">查看简历</a>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-img">
+                    <span>褚</span>
+                </div>
+                <h3 class="member-name">褚一满</h3>
+                <p class="member-role">前端开发工程师</p>
+                <a href="../FlowerC/introduce/intruduce cym.html" class="resume-link">查看简历</a>
+            </div>
+            
+            <div class="team-member">
+                <div class="member-img">
+                    <span>常</span>
+                </div>
+                <h3 class="member-name">常如意</h3>
+                <p class="member-role">UI/内容设计师</p>
+                <a href="resume_chang.html" class="resume-link">查看简历</a>
+            </div>
+            
+            
+            <div class="team-member">
+                <div class="member-img">
+                    <span>李</span>
+                </div>
+                <h3 class="member-name">李桂昇</h3>
+                <p class="member-role">后端开发工程师</p>
+                <a href="resume_ligui.html" class="resume-link">查看简历</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
