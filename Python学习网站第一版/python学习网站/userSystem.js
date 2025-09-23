@@ -301,9 +301,9 @@ class UserSystem {
             
             document.body.appendChild(userInfoDiv);
             
-            // 添加事件监听
+            // 添加事件监听111111111111111111111111111111111111111111111111111111111111
             document.getElementById('continueBtn').addEventListener('click', () => {
-                window.location.href = 'work.html';
+                window.location.href = 'menu.html';
             });
             
             document.getElementById('logoutBtn').addEventListener('click', () => {
