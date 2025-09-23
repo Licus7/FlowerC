@@ -302,6 +302,8 @@ class UserSystem {
             document.body.appendChild(userInfoDiv);
             
             // 添加事件监听111111111111111111111111111111111111111111111111111111111111
+            //11111111111111111121212121212121212121212121212121212121212121212121212
+            //112121212121231321321423142351423143254132541352415243154231432514325142143254123541325143251
             document.getElementById('continueBtn').addEventListener('click', () => {
                 window.location.href = 'menu.html';
             });
