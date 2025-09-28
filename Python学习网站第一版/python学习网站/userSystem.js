@@ -19,7 +19,7 @@ class UserSystem {
 
     openDatabase() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open('UserDatabase', 2); // 版本号改为2
+            const request = indexedDB.open('UserDatabase', 2); 
 
             request.onerror = () => reject(request.error);
             
