@@ -1,13 +1,13 @@
-// 数据库变量
+
 let db;
 let currentChapterId = null;
 let currentLessonId = null;
 let currentLessonIndex = 0;
 let currentChapterLessons = [];
 
-// 初始化页面和数据库
+
 document.addEventListener('DOMContentLoaded', function() {
-    // 初始化按钮事件
+ 
     document.getElementById('init-db').addEventListener('click', initDatabase);
     document.getElementById('submit-exercise').addEventListener('click', submitExercise);
     document.getElementById('show-solution').addEventListener('click', showSolution);
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('prev-lesson').addEventListener('click', loadPreviousLesson);
     document.getElementById('next-lesson').addEventListener('click', loadNextLesson);
     
-    // 为章节链接添加点击事件
+   
     document.querySelectorAll('.chapter-link').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
@@ -24,19 +24,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // 打开数据库
+    
     openDatabase();
 });
 
-// 打开或创建IndexedDB数据库（修复版）
+
 function openDatabase() {
     return new Promise((resolve, reject) => {
-        // 先尝试删除旧数据库
+       
         const deleteRequest = indexedDB.deleteDatabase('PythonCourseDB');
         
         deleteRequest.onerror = function(event) {
             console.error('删除旧数据库失败:', event.target.error);
-            // 即使删除失败也继续尝试打开
+            
             proceedWithOpen();
         };
         
@@ -63,7 +63,7 @@ function openDatabase() {
                 db = event.target.result;
                 console.log('数据库已打开');
                 
-                // 添加数据库错误监听
+                
                 db.onerror = function(event) {
                     console.error('数据库错误:', event.target.error);
                     alert('数据库错误: ' + event.target.error.message);
@@ -81,14 +81,14 @@ function openDatabase() {
             request.onupgradeneeded = function(event) {
                 const db = event.target.result;
                 
-                // 创建章节表
+                
                 const chapterStore = db.createObjectStore('chapters', { 
                     keyPath: 'id',
                     autoIncrement: true
                 });
                 chapterStore.createIndex('order_num', 'order_num', { unique: true });
                 
-                // 创建课程表
+              
                 const lessonStore = db.createObjectStore('lessons', {
                     keyPath: 'id',
                     autoIncrement: true
@@ -96,14 +96,14 @@ function openDatabase() {
                 lessonStore.createIndex('chapter_id', 'chapter_id');
                 lessonStore.createIndex('order_num', 'order_num');
                 
-                // 创建代码示例表
+               
                 const codeExampleStore = db.createObjectStore('code_examples', {
                     keyPath: 'id',
                     autoIncrement: true
                 });
                 codeExampleStore.createIndex('lesson_id', 'lesson_id');
                 
-                // 创建练习答案表
+                
                 const exerciseSolutionStore = db.createObjectStore('exercise_solutions', {
                     keyPath: 'id',
                     autoIncrement: true
@@ -116,7 +116,7 @@ function openDatabase() {
     });
 }
 
-// 检查数据库是否已初始化
+
 function checkIfDatabaseInitialized() {
     if (!db) {
         console.error('数据库未初始化');
@@ -135,7 +135,7 @@ function checkIfDatabaseInitialized() {
                 </div>
             `;
         } else {
-            // 默认激活第一章
+           
             loadChapter(1);
         }
     };
@@ -145,21 +145,21 @@ function checkIfDatabaseInitialized() {
     };
 }
 
-// 加载章节
+
 function loadChapter(chapterId) {
     currentChapterId = chapterId;
     
-    // 更新活动状态
+   
     document.querySelectorAll('.chapter-link').forEach(item => {
         item.classList.remove('active');
     });
     document.querySelector(`.chapter-link[data-chapter-id="${chapterId}"]`).classList.add('active');
     
-    // 加载章节的所有课程
+    
     loadChapterLessons(chapterId);
 }
 
-// 加载章节的所有课程
+
 function loadChapterLessons(chapterId) {
     const transaction = db.transaction(['lessons'], 'readonly');
     const store = transaction.objectStore('lessons');
@@ -169,10 +169,10 @@ function loadChapterLessons(chapterId) {
     request.onsuccess = function() {
         currentChapterLessons = request.result;
         
-        // 按order_num排序
+        
         currentChapterLessons.sort((a, b) => a.order_num - b.order_num);
         
-        // 显示第一章的第一课
+        
         if (currentChapterLessons.length > 0) {
             currentLessonIndex = 0;
             loadLesson(currentChapterLessons[0].id);
@@ -190,11 +190,11 @@ function loadChapterLessons(chapterId) {
     };
 }
 
-// 加载特定课程内容
+
 function loadLesson(lessonId) {
     currentLessonId = lessonId;
     
-    // 获取课程详情
+   
     const lessonTransaction = db.transaction(['lessons'], 'readonly');
     const lessonStore = lessonTransaction.objectStore('lessons');
     const lessonRequest = lessonStore.get(parseInt(lessonId));
@@ -203,11 +203,11 @@ function loadLesson(lessonId) {
         const lesson = lessonRequest.result;
         if (!lesson) return;
         
-        // 更新页面内容
+       
         document.getElementById('lesson-title').textContent = lesson.title;
         document.getElementById('lesson-content').innerHTML = lesson.content;
         
-        // 如果是练习，显示练习区域
+       
         const exerciseArea = document.getElementById('exercise-area');
         if (lesson.is_exercise) {
             exerciseArea.style.display = 'block';
@@ -219,15 +219,15 @@ function loadLesson(lessonId) {
             exerciseArea.style.display = 'none';
         }
         
-        // 加载代码示例
+        
         loadCodeExamples(lessonId);
         
-        // 更新导航按钮状态
+        
         updateNavigationButtons();
     };
 }
 
-// 加载代码示例
+
 function loadCodeExamples(lessonId) {
     const transaction = db.transaction(['code_examples'], 'readonly');
     const store = transaction.objectStore('code_examples');
@@ -241,7 +241,7 @@ function loadCodeExamples(lessonId) {
         if (codeExamples.length > 0) {
             codeExamplesContainer.style.display = 'block';
             
-            // 只显示第一个代码示例
+            
             const example = codeExamples[0];
             document.getElementById('code-content').textContent = example.code;
             document.getElementById('code-explanation').innerHTML = example.explanation || '';
@@ -251,7 +251,7 @@ function loadCodeExamples(lessonId) {
     };
 }
 
-// 更新导航按钮状态
+
 function updateNavigationButtons() {
     const prevButton = document.getElementById('prev-lesson');
     const nextButton = document.getElementById('next-lesson');
@@ -260,7 +260,7 @@ function updateNavigationButtons() {
     nextButton.disabled = currentLessonIndex >= currentChapterLessons.length - 1;
 }
 
-// 加载上一课
+
 function loadPreviousLesson() {
     if (currentLessonIndex > 0) {
         currentLessonIndex--;
@@ -268,7 +268,7 @@ function loadPreviousLesson() {
     }
 }
 
-// 加载下一课
+
 function loadNextLesson() {
     if (currentLessonIndex < currentChapterLessons.length - 1) {
         currentLessonIndex++;
@@ -276,14 +276,14 @@ function loadNextLesson() {
     }
 }
 
-// 初始化数据库（修复版）
+
 function initDatabase() {
     if (!db) {
         alert('数据库未正确初始化，请刷新页面重试');
         return;
     }
 
-    // 完整的10章Python教学内容
+    
     const chapters = [
         { id: 1, title: 'Python简介', description: '了解Python的基本概念和历史', order_num: 1 },
         { id: 2, title: '基础语法', description: '学习Python的基本语法结构', order_num: 2 },
@@ -297,9 +297,9 @@ function initDatabase() {
         { id: 10, title: '常用库介绍', description: '了解Python标准库', order_num: 10 }
     ];
     
-    // 完整的课程内容
+   
     const lessons = [
-        // 第一章: Python简介
+        
         { id: 1, chapter_id: 1, title: 'Python是什么', 
           content: 'Python是一种高级编程语言，由Guido van Rossum于1991年创建。它具有以下特点：<br><br>• 解释型语言 - 不需要编译，直接运行<br>• 动态类型 - 变量不需要声明类型<br>• 跨平台 - 可在Windows、Mac和Linux上运行<br>• 丰富的标准库 - 提供大量内置模块<br>• 社区支持 - 拥有庞大的开发者社区', 
           order_num: 1, is_exercise: false },
@@ -313,7 +313,7 @@ function initDatabase() {
           content: '让我们编写第一个Python程序：<br><br>1. 创建一个名为hello.py的文件<br>2. 输入以下代码：<br><code>print("Hello, World!")</code><br>3. 保存文件<br>4. 在命令行运行：python hello.py<br><br>你应该会看到输出：Hello, World!', 
           order_num: 4, is_exercise: true },
         
-        // 第二章: 基础语法
+       
         { id: 5, chapter_id: 2, title: '变量和赋值', 
           content: '在Python中，变量不需要声明类型，直接赋值即可：<br><br><code>x = 10</code>          # 整数<br><code>name = "Alice"</code>  # 字符串<br><code>pi = 3.14</code>       # 浮点数<br><code>is_active = True</code> # 布尔值<br><br>变量命名规则：<br>• 只能包含字母、数字和下划线<br>• 不能以数字开头<br>• 区分大小写<br>• 避免使用Python关键字', 
           order_num: 1, is_exercise: false },
@@ -327,7 +327,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 创建一个变量age并赋值为25<br>2. 创建一个变量name并赋值为你的名字<br>3. 计算10的3次方并将结果存入变量power<br>4. 判断age是否大于18，结果存入变量is_adult<br>5. 打印所有变量的值和类型', 
           order_num: 4, is_exercise: true },
         
-        // 第三章: 数据类型
+        
         { id: 9, chapter_id: 3, title: '数字类型', 
           content: 'Python中的数字类型包括：<br><br>整数(int)：<br>• 没有大小限制<br>• 支持十进制、二进制(0b)、八进制(0o)、十六进制(0x)<br><br>浮点数(float)：<br>• 带小数点的数字<br>• 可以用科学计数法表示(3e2 = 300)<br><br>复数(complex)：<br>• 如 3+5j<br><br>数字运算：<br>abs()绝对值  round()四舍五入  math模块提供更多数学函数', 
           order_num: 1, is_exercise: false },
@@ -344,7 +344,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 创建一个包含3个水果名称的列表fruits<br>2. 创建一个包含姓名和年龄的字典person<br>3. 将"orange"添加到fruits列表中<br>4. 修改person字典中的年龄<br>5. 创建一个包含1-10偶数的集合even_numbers<br>6. 打印所有变量', 
           order_num: 5, is_exercise: true },
         
-        // 第四章: 控制流程
+        
         { id: 14, chapter_id: 4, title: '条件语句', 
           content: 'Python使用if语句进行条件判断：<br><br><code>if 条件1:<br>    执行代码块1<br>elif 条件2:<br>    执行代码块2<br>else:<br>    执行代码块3</code><br><br>比较运算符：<br>== 等于  != 不等于  &gt; 大于  &lt; 小于  &gt;= 大于等于  &lt;= 小于等于<br><br>逻辑运算符：<br>and 与  or 或  not 非', 
           order_num: 1, is_exercise: false },
@@ -355,7 +355,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 编写一个程序，判断用户输入的数字是奇数还是偶数<br>2. 编写一个程序，计算1到100的和<br>3. 编写一个程序，打印1到100的所有质数', 
           order_num: 3, is_exercise: true },
         
-        // 第五章: 函数
+        
         { id: 17, chapter_id: 5, title: '函数定义', 
           content: 'Python使用def关键字定义函数：<br><br><code>def 函数名(参数1, 参数2):<br>    """文档字符串"""<br>    函数体<br>    return 返回值</code><br><br>函数特点：<br>• 使用def关键字定义<br>• 使用return返回值<br>• 可以没有返回值(返回None)<br>• 可以有默认参数值<br>• 可以接受可变数量参数', 
           order_num: 1, is_exercise: false },
@@ -366,7 +366,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 编写一个计算圆面积的函数<br>2. 编写一个函数，接收任意数量的数字并返回它们的和<br>3. 编写一个递归函数计算阶乘', 
           order_num: 3, is_exercise: true },
         
-        // 第六章: 模块和包
+        
         { id: 20, chapter_id: 6, title: '模块导入', 
           content: 'Python模块是一个.py文件，包含可重用的代码：<br><br>导入方式：<br><code>import 模块名<br>from 模块名 import 函数/变量<br>from 模块名 import *<br>import 模块名 as 别名</code><br><br>常用模块：<br>math - 数学函数<br>random - 随机数<br>datetime - 日期时间<br>os - 操作系统接口<br>sys - 系统相关参数', 
           order_num: 1, is_exercise: false },
@@ -377,7 +377,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 创建一个自定义模块，包含几个实用函数<br>2. 使用pip安装一个第三方包(如requests)<br>3. 编写一个程序使用datetime模块显示当前时间', 
           order_num: 3, is_exercise: true },
         
-        // 第七章: 文件操作
+        
         { id: 23, chapter_id: 7, title: '文件读写', 
           content: 'Python使用open()函数操作文件：<br><br><code>with open("文件名", "模式") as 文件对象:<br>    文件操作</code><br><br>文件模式：<br>r - 读取(默认)<br>w - 写入(覆盖)<br>a - 追加<br>b - 二进制模式<br>+ - 读写模式<br><br>常用方法：<br>read() - 读取内容<br>write() - 写入内容<br>readlines() - 读取所有行<br>writelines() - 写入多行', 
           order_num: 1, is_exercise: false },
@@ -388,7 +388,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 编写一个程序，读取文本文件并统计单词数量<br>2. 编写一个程序，将用户输入的内容保存到文件<br>3. 编写一个程序，遍历目录下的所有文件', 
           order_num: 3, is_exercise: true },
         
-        // 第八章: 异常处理
+        
         { id: 26, chapter_id: 8, title: '异常捕获', 
           content: 'Python使用try-except处理异常：<br><br><code>try:<br>    可能出错的代码<br>except 异常类型 as 变量:<br>    异常处理代码<br>else:<br>    没有异常时执行<br>finally:<br>    无论是否异常都执行</code><br><br>常见异常：<br>Exception - 所有异常的基类<br>ValueError - 值错误<br>TypeError - 类型错误<br>IOError - I/O错误<br>IndexError - 索引错误<br>KeyError - 键错误', 
           order_num: 1, is_exercise: false },
@@ -399,7 +399,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 编写一个程序，处理除零错误<br>2. 编写一个自定义异常类<br>3. 编写一个程序，处理文件不存在的异常', 
           order_num: 3, is_exercise: true },
         
-        // 第九章: 面向对象编程
+        
         { id: 29, chapter_id: 9, title: '类和对象', 
           content: 'Python是面向对象语言：<br><br><code>class 类名:<br>    def __init__(self, 参数):  # 构造方法<br>        self.属性 = 参数<br>    <br>    def 方法名(self, 参数):<br>        方法体</code><br><br>对象特点：<br>• 封装 - 将数据和操作封装在类中<br>• 继承 - 子类继承父类的属性和方法<br>• 多态 - 不同类可以有同名方法', 
           order_num: 1, is_exercise: false },
@@ -410,7 +410,7 @@ function initDatabase() {
           content: '完成以下练习：<br><br>1. 定义一个Person类，包含name和age属性<br>2. 创建一个Student类继承Person类，添加grade属性<br>3. 实现一个多态示例', 
           order_num: 3, is_exercise: true },
         
-        // 第十章: 常用库介绍
+       
         { id: 32, chapter_id: 10, title: '标准库', 
           content: 'Python常用标准库：<br><br>• math - 数学函数<br>• random - 随机数<br>• datetime - 日期时间<br>• json - JSON处理<br>• re - 正则表达式<br>• os - 操作系统接口<br>• sys - 系统相关参数<br>• argparse - 命令行参数解析<br>• collections - 扩展的数据结构<br>• itertools - 迭代器工具', 
           order_num: 1, is_exercise: false },
@@ -422,7 +422,7 @@ function initDatabase() {
           order_num: 3, is_exercise: true }
     ];
     
-    // 完整的代码示例
+    
     const codeExamples = [
         { id: 1, lesson_id: 1, code: 'print("Hello, World!")', 
           explanation: '这是Python中最简单的程序，用于输出文本到控制台', order_num: 1 },
@@ -452,7 +452,7 @@ function initDatabase() {
           explanation: '展示了类的定义和使用', order_num: 1 }
     ];
     
-    // 练习答案
+   
     const exerciseSolutions = [
         { id: 1, lesson_id: 4, code: '# 第一个Python程序\nprint("Hello, World!")', 
           explanation: '这是最简单的Python程序，输出Hello, World!' },
@@ -476,7 +476,7 @@ function initDatabase() {
           explanation: '展示了常用库的使用' }
     ];
     
-    // 使用事务队列确保顺序执行
+    
     const executeOperations = async () => {
         try {
             // 添加章节
@@ -500,11 +500,11 @@ function initDatabase() {
         }
     };
     
-    // 执行操作
+    
     executeOperations();
 }
 
-// 批量添加数据辅助函数
+
 function bulkAdd(storeName, items) {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readwrite');
@@ -530,7 +530,7 @@ function bulkAdd(storeName, items) {
     });
 }
 
-// 提交练习
+
 function submitExercise() {
     const solution = document.getElementById('exercise-solution').value.trim();
     const feedback = document.getElementById('exercise-feedback');
@@ -551,7 +551,7 @@ function submitExercise() {
     `;
 }
 
-// 显示参考答案
+
 function showSolution() {
     if (!currentLessonId) return;
     
@@ -574,7 +574,7 @@ function showSolution() {
     };
 }
 
-// 复制代码功能
+
 function copyCode() {
     const codeContent = document.getElementById('code-content');
     const range = document.createRange();
