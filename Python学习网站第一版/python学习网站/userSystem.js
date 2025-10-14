@@ -7,16 +7,16 @@ class UserSystem {
 
     async init() {
         try {
-            // 先尝试删除旧数据库（确保索引正确创建）
+           
             await this.cleanOldDatabase();
             
-            // 打开新数据库
+           
             await this.openDatabase();
             
-            // 尝试自动登录
+          
             const user = await this.autoLogin();
             if (user) {
-                // 自动登录成功后直接跳转到start.html
+               
                 setTimeout(() => {
                     window.location.href = 'menu.html';
                 }, 500);
@@ -49,7 +49,7 @@ class UserSystem {
 
     openDatabase() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open('UserDatabase', 3); // 版本号增加到3
+            const request = indexedDB.open('UserDatabase', 3); 
             
             request.onerror = () => {
                 console.error('数据库打开失败:', request.error);
@@ -66,7 +66,7 @@ class UserSystem {
                 const db = event.target.result;
                 console.log('数据库升级中，旧版本:', event.oldVersion);
                 
-                // 创建用户表（如果不存在）
+                
                 if (!db.objectStoreNames.contains('users')) {
                     const userStore = db.createObjectStore('users', { 
                         keyPath: 'id', 
@@ -161,7 +161,7 @@ class UserSystem {
         this.showMessage('已退出登录', 'info');
     }
 
-    // 辅助方法
+    
     validateUserData({ username, password }) {
         if (!username || !password) {
             throw new Error('请填写用户名和密码');
@@ -207,7 +207,7 @@ class UserSystem {
     }
 
     hashPassword(password) {
-        // 改进的哈希算法
+       
         let hash = 5381;
         for (let i = 0; i < password.length; i++) {
             hash = (hash * 33) ^ password.charCodeAt(i);
@@ -215,13 +215,13 @@ class UserSystem {
         return (hash >>> 0).toString(16); // 转换为无符号32位整数并转为16进制
     }
 
-    // 数据库查询方法
+    
     async checkUserExists(username) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(['users'], 'readonly');
             const userStore = transaction.objectStore('users');
             
-            // 检查索引是否存在
+           
             if (!userStore.indexNames.contains('username')) {
                 reject(new Error('username索引不存在'));
                 return;
@@ -240,7 +240,7 @@ class UserSystem {
             const transaction = this.db.transaction(['users'], 'readonly');
             const userStore = transaction.objectStore('users');
             
-            // 检查索引是否存在
+        
             if (!userStore.indexNames.contains('username')) {
                 reject(new Error('username索引不存在'));
                 return;
@@ -305,7 +305,7 @@ class UserSystem {
         }
     }
 
-    // UI 方法
+    
     showLoginForm() {
         document.querySelector('.wrapper').style.display = 'flex';
     }
@@ -338,7 +338,7 @@ class UserSystem {
 
         document.body.appendChild(messageDiv);
 
-        // 3秒后自动消失
+        
         setTimeout(() => {
             if (messageDiv.parentNode) {
                 messageDiv.style.opacity = '0';
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await userSystem.login({ username, password });
             userSystem.showMessage(result.message, 'success');
             
-            // 登录成功后会在login方法中跳转，这里不需要额外处理
+           
 
         } catch (error) {
             userSystem.showMessage(error.message, 'error');
@@ -379,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 注册表单提交
+    
     document.getElementById('signInForm')?.addEventListener('submit', async function(event) {
         event.preventDefault();
         
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 输入框回车键支持
+    
     document.querySelectorAll('.flip-card__input').forEach(input => {
         input.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// 切换卡片函数
+
 function toggleCard() {
     document.getElementById('flipCard').classList.toggle('flipped');
 }
