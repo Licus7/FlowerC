@@ -73,9 +73,9 @@ FlowerC-System/
 
 #### 3.1.1 类设计
 ```javascript
-/**
- * 用户管理核心类
- */
+
+     //用户管理核心类
+ 
 class UserManager {
     constructor() {
         this.currentUser = null;
@@ -111,9 +111,7 @@ class UserManager {
     }
 }
 
-/**
- * 用户数据库操作类
- */
+     // 用户数据库操作类
 class UserDB {
     async createUser(userData) { ... }
     async findUser(username) { ... }
@@ -124,7 +122,7 @@ class UserDB {
 
 #### 3.1.2 界面设计
 ```html
-<!-- 注册页面结构 -->
+<-- 注册页面结构 -->
 <div class="register-container">
     <h2>用户注册</h2>
     <form id="registerForm">
@@ -141,9 +139,7 @@ class UserDB {
 
 #### 3.2.1 类设计
 ```javascript
-/**
- * 学习管理核心类
- */
+//学习管理核心类
 class LearningManager {
     constructor() {
         this.currentChapter = 1;
@@ -172,9 +168,8 @@ class LearningManager {
     }
 }
 
-/**
- * 内容加载器
- */
+// 内容加载器
+ 
 class ContentLoader {
     async loadTextContent(chapterId) { ... }
     async loadCodeExamples(chapterId) { ... }
@@ -201,9 +196,8 @@ const chapterSchema = {
 
 #### 3.3.1 代码检测引擎设计
 ```javascript
-/**
- * 代码检测引擎
- */
+//代码检测引擎
+
 class CodeValidator {
     constructor() {
         this.sandbox = new CodeSandbox();
@@ -239,9 +233,7 @@ class CodeValidator {
     }
 }
 
-/**
- * 代码执行沙箱
- */
+//代码执行沙箱
 class CodeSandbox {
     constructor() {
         this.timeout = 5000; // 5秒超时
@@ -285,9 +277,7 @@ const pythonTestCases = {
 
 #### 3.4.1 类设计
 ```javascript
-/**
- * 金币管理系统
- */
+// 金币管理系统
 class CoinSystem {
     constructor() {
         this.balance = 0;
@@ -315,9 +305,8 @@ class CoinSystem {
     }
 }
 
-/**
- * 精灵收集系统
- */
+//精灵收集系统
+
 class PokemonCollection {
     constructor() {
         this.collection = new Map();
