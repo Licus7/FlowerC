@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python初学者教程</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 侧边栏导航 -->
+    <nav class="sidebar">
+        <div>
+            <h4 class="sidebar-heading">
+                <i class="fas fa-code"></i> Python学习教程
+            </h4>
+            <ul id="chapter-list" class="chapter-list">
+                <!-- 1-10章导航将直接显示 -->
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="1">
+                        <span class="chapter-number">1.</span> Python简介
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="2">
+                        <span class="chapter-number">2.</span> 基础语法
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="3">
+                        <span class="chapter-number">3.</span> 数据类型
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="4">
+                        <span class="chapter-number">4.</span> 控制流程
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="5">
+                        <span class="chapter-number">5.</span> 函数
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="6">
+                        <span class="chapter-number">6.</span> 模块和包
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="7">
+                        <span class="chapter-number">7.</span> 文件操作
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="8">
+                        <span class="chapter-number">8.</span> 异常处理
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="9">
+                        <span class="chapter-number">9.</span> 面向对象编程
+                    </a>
+                </li>
+                <li class="chapter-item">
+                    <a href="#" class="chapter-link" data-chapter-id="10">
+                        <span class="chapter-number">10.</span> 常用库介绍
+                    </a>
+                </li>
+            </ul>
+            <div style="padding: 15px;">
+                <button id="init-db" class="btn btn-sm btn-outline-light w-100">
+                    <i class="fas fa-database"></i> 初始化数据库
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main>
+        <div class="content-card">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center mb-4">
+                <h1 id="lesson-title" class="lesson-title">欢迎来到Python学习教程</h1>
+                <div class="btn-group">
+                    <button id="prev-lesson" class="btn btn-outline-primary btn-sm" disabled>
+                        <i class="fas fa-arrow-left"></i> 上一课
+                    </button>
+                    <button id="next-lesson" class="btn btn-outline-primary btn-sm" disabled>
+                        下一课 <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="lesson-content" class="mb-4">
+                <p>请从左侧选择章节开始学习</p>
+            </div>
+            
+            <div id="code-examples" class="mb-4" style="display: none;">
+                <div class="code-header">
+                    <h5><i class="fas fa-code"></i> 代码示例</h5>
+                    <button id="copy-code-btn" class="copy-btn">
+                        <i class="fas fa-copy"></i> 复制代码
+                    </button>
+                </div>
+                <pre><code id="code-content" class="language-python"></code></pre>
+                <div id="code-explanation" class="mt-2"></div>
+            </div>
+            
+            <div id="exercise-area" class="exercise" style="display: none;">
+                <h5><i class="fas fa-pencil-alt"></i> 练习</h5>
+                <div id="exercise-content"></div>
+                <div id="exercise-input" class="mt-3">
+                    <textarea id="exercise-solution" class="form-control" rows="5" placeholder="在这里输入你的代码解决方案..."></textarea>
+                </div>
+                <div class="mt-3">
+                    <button id="submit-exercise" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> 提交答案
+                    </button>
+                    <button id="show-solution" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-lightbulb"></i> 查看参考答案
+                    </button>
+                </div>
+                <div id="exercise-feedback" class="mt-3"></div>
+                <div id="exercise-solution-area" class="mt-3" style="display: none;">
+                    <h6><i class="fas fa-check-circle"></i> 参考答案</h6>
+                    <pre><code id="exercise-solution-code" class="language-python"></code></pre>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

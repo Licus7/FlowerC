@@ -1,0 +1,240 @@
+:root {
+    --primary-color: #3776ab;
+    --secondary-color: #ffd43b;
+    --dark-color: #2c3e50;
+    --light-color: #f8f9fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    background-attachment: fixed;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    padding: 20px 0;
+    width: 280px;
+    background-color: var(--dark-color);
+    color: white;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+}
+
+.sidebar-heading {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+    padding: 0 20px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-heading i {
+    margin-right: 10px;
+    color: var(--secondary-color);
+}
+
+.chapter-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chapter-item {
+    padding: 0 15px;
+}
+
+.chapter-link {
+    display: block;
+    padding: 10px 15px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all 0.3s;
+    border-radius: 4px;
+    margin: 2px 0;
+    font-weight: 500;
+}
+
+.chapter-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.chapter-link.active {
+    color: white;
+    background-color: rgba(55, 118, 171, 0.2);
+    border-left: 3px solid var(--primary-color);
+    font-weight: 600;
+}
+
+.chapter-link i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.chapter-number {
+    display: inline-block;
+    width: 25px;
+    font-weight: bold;
+    color: var(--secondary-color);
+}
+
+main {
+    margin-left: 280px;
+    padding: 30px;
+    transition: all 0.3s;
+}
+
+.content-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.lesson-title {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--light-color);
+}
+
+pre {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    color: #d63384;
+}
+
+.exercise {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 6px;
+    margin-top: 20px;
+    border-left: 4px solid var(--secondary-color);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #2c5d8a;
+    border-color: #2c5d8a;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.copy-btn {
+    background-color: var(--dark-color);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+.copy-btn:hover {
+    background-color: #1a252f;
+}
+
+/* 练习区样式 */
+#exercise-input textarea {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+}
+
+#exercise-feedback .alert {
+    padding: 10px 15px;
+    margin-bottom: 0;
+}
+
+#exercise-solution-area {
+    background-color: #f0f8ff;
+    padding: 15px;
+    border-radius: 6px;
+}
+
+/* 导航按钮样式 */
+.btn-group {
+    flex-shrink: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 250px;
+    }
+    
+    main {
+        margin-left: 250px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        padding: 15px;
+    }
+    
+    main {
+        margin-left: 0;
+        padding: 15px;
+    }
+    
+    .content-card {
+        padding: 20px;
+    }
+    
+    .btn-group {
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    #prev-lesson, #next-lesson {
+        width: 50%;
+    }
+}
