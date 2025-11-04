@@ -84,7 +84,7 @@ gantt
 
 ### 1.4 案例分析：我们的Python学习网站项目
 
-![项目功能优先级矩阵](priority_matrix.png)
+![项目功能优先级矩阵](项目功能优先级矩阵.jpg)
 
 **质量要求的平衡：**
 在时间有限的情况下我们做出权衡：
@@ -232,7 +232,7 @@ class ScrumProcess:
 - 团队规模小（4人），适合敏捷
 
 **实际执行中的调整**
-![迭代开发示意图](iteration_development.png)
+![迭代开发示意图](迭代开发.png)
 
 **第一轮迭代**：
 - 计划：完成用户系统+基础框架
@@ -478,25 +478,6 @@ graph LR
     D --> E[完成练习]
     E --> F[获得进度]
 ```
-展示数据在系统中的流动过程
-
-**实体关系图 - 理清数据关系**
-```mermaid
-erDiagram
-    USER ||--o{ PROGRESS : has
-    USER {
-        string user_id PK
-        string username
-        string email
-    }
-    PROGRESS {
-        string progress_id PK
-        string user_id FK
-        string chapter_id
-        int completion_rate
-    }
-```
-描述数据实体及其相互关系
 
 **用例图 - 描述系统功能**
 ```mermaid
@@ -509,7 +490,6 @@ graph TD
     C --> G[内容展示]
     D --> H[练习评分]
 ```
-从用户角度展示系统功能边界
 
 #### 4.2.3 需求管理
 
