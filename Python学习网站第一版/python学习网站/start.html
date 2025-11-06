@@ -7,7 +7,7 @@
     
     <link rel="stylesheet" href="../css/menu.css">
     <link rel="stylesheet" href="../css/back_button.css">
-    
+    <link rel="stylesheet" href="../css/mouse.css">
     <style>
         body {
             margin: 0;
@@ -107,24 +107,25 @@
     
     <div class="menu">
         <ul>
-            <li><a href="开始\examine.html" class="btn-retro">考核</a></li>
             <li><a href="开始/book/index.html" class="btn-retro">课程</a></li>
-            <li><a href="开始\boss.html" class="btn-retro">boss</a></li>
             <li><a href="开始\practice.html" class="btn-retro">练习</a></li>
+            <li><a href="开始\boss.html" class="btn-retro">boss</a></li>
+            
             <li>
-                <img id="speaker" onclick="play_music()" style="width: 40px; height: 40px;" src="像素城市霓虹动图.gif" alt="音乐控制">
+                <!-- 点击前显示静音图标 -->
+                <img id="speaker" onclick="play_music()" style="width: 40px; height: 40px;" src="背景+音频/音乐.jpg" alt="音乐控制">
             </li>
         </ul>
     </div>
 
     <audio id="music-player" loop>
-        <source src="../../背景+音频/浅夏晴空-玖九9#2CUNJ4.mp3" type="audio/mpeg">
+        <source src="背景+音频/浅夏晴空-玖九.mp3" type="audio/mpeg">
         您的浏览器不支持音频元素。
     </audio>
 
     <script src="../js/menu.js"></script>
     <script src="../js/index.js"></script>
-    
+    <script src="../js/mouse.js"></script>
     <script>
         function play_music() {
             const player = document.getElementById('music-player');
@@ -132,10 +133,10 @@
             
             if (player.paused) {
                 player.play();
-                speaker.src = "背景+音频/像素城市霓虹动图.gif"; 
+                speaker.src = "背景+音频/静音.jpg"; // 点击后显示静音图标
             } else {
                 player.pause();
-                speaker.src = "背景+音频/248665bb223983314c43349065982eb9.jpg";
+                speaker.src = "背景+音频/音乐.jpg"; // 点击后显示音乐图标
             }
         }
         
@@ -144,6 +145,7 @@
             player.volume = 0.5; 
             
             player.play().catch(e => {
+                console.log('自动播放被阻止，需要用户交互');
             });
         });
     </script>

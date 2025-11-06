@@ -7,7 +7,7 @@
     
     <link rel="stylesheet" href="../css/menu.css">
     <link rel="stylesheet" href="../css/back_button.css">
-    
+    <link rel="stylesheet" href="../css/mouse.css">
     <style>
 
         body {
@@ -113,7 +113,8 @@
             <li><a href="" class="btn-retro">排名</a></li>
             <li><a href="" class="btn-retro">信封</a></li>
             <li>
-                <img id="speaker" onclick="play_music()" style="width: 40px; height: 40px;" src="像素城市霓虹动图.gif" alt="音乐控制">
+                <!-- 点击前显示静音图标 -->
+                <img id="speaker" onclick="play_music()" style="width: 40px; height: 40px;" src="背景+音频/音乐.jpg" alt="音乐控制">
             </li>
         </ul>
     </div>
@@ -125,18 +126,18 @@
 
     <script src="../js/menu.js"></script>
     <script src="../js/index.js"></script>
-    
-    <script>
+    <script src="../js/mouse.js"></script>
+   <script>
         function play_music() {
             const player = document.getElementById('music-player');
             const speaker = document.getElementById('speaker');
             
             if (player.paused) {
                 player.play();
-                speaker.src = "背景+音频/像素城市霓虹动图.gif";
+                speaker.src = "背景+音频/静音.jpg"; // 点击后显示静音图标
             } else {
                 player.pause();
-                speaker.src = "替代静音状态的图片.gif";
+                speaker.src = "背景+音频/音乐.jpg"; // 点击后显示音乐图标
             }
         }
         
@@ -145,7 +146,7 @@
             player.volume = 0.5; 
             
             player.play().catch(e => {
-                console.log("自动播放被阻止:", e);
+                console.log('自动播放被阻止，需要用户交互');
             });
         });
     </script>
