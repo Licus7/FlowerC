@@ -1,17 +1,28 @@
 :root {
     --primary-color: #3776ab;
     --secondary-color: #ffd43b;
-    --dark-color: #2c3e50;
+    --dark-color: rgba(44, 62, 80, 0.6); /* 改为更透明 */
     --light-color: #f8f9fa;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    min-height: 100vh;
-    background-attachment: fixed;
-    margin: 0;
-    padding: 0;
+    background: url('../../背景+音频/像素城市3.jpg') no-repeat center center fixed !important;
+    background-size: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+}
+
+/* 添加半透明遮罩层，确保文字可读性 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.2); /* 减轻遮罩让背景更清晰 */
+    z-index: -1;
 }
 
 .sidebar {
@@ -22,10 +33,13 @@ body {
     z-index: 100;
     padding: 20px 0;
     width: 280px;
-    background-color: var(--dark-color);
+    background-color: rgba(44, 62, 80, 0.6) !important; /* 更透明 */
+    backdrop-filter: blur(15px) !important; /* 更强的毛玻璃效果 */
+    -webkit-backdrop-filter: blur(15px) !important;
     color: white;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
     overflow-y: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-heading {
@@ -36,7 +50,7 @@ body {
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
 .sidebar-heading i {
@@ -57,32 +71,27 @@ body {
 .chapter-link {
     display: block;
     padding: 10px 15px;
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     border-left: 3px solid transparent;
     transition: all 0.3s;
     border-radius: 4px;
     margin: 2px 0;
     font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .chapter-link:hover {
     color: white;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
     border-left: 3px solid var(--secondary-color);
 }
 
 .chapter-link.active {
     color: white;
-    background-color: rgba(55, 118, 171, 0.2);
+    background-color: rgba(55, 118, 171, 0.3);
     border-left: 3px solid var(--primary-color);
     font-weight: 600;
-}
-
-.chapter-link i {
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
 }
 
 .chapter-number {
@@ -99,25 +108,30 @@ main {
 }
 
 .content-card {
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.75) !important; /* 更透明 */
+    backdrop-filter: blur(12px) !important; /* 更强的毛玻璃效果 */
+    -webkit-backdrop-filter: blur(12px) !important;
     border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     padding: 30px;
     margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .lesson-title {
     color: var(--primary-color);
     margin-bottom: 20px;
     padding-bottom: 10px;
-    border-bottom: 2px solid var(--light-color);
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 pre {
-    background-color: #f8f9fa;
+    background-color: rgba(248, 249, 250, 0.7) !important; /* 更透明 */
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
     padding: 15px;
     border-radius: 6px;
-    border: 1px solid #dee2e6;
+    border: 1px solid rgba(222, 226, 230, 0.4);
     overflow-x: auto;
     font-size: 14px;
     line-height: 1.5;
@@ -129,31 +143,54 @@ code {
 }
 
 .exercise {
-    background-color: #f8f9fa;
+    background-color: rgba(248, 249, 250, 0.7) !important; /* 更透明 */
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     padding: 20px;
     border-radius: 6px;
     margin-top: 20px;
     border-left: 4px solid var(--secondary-color);
 }
 
+/* 按钮磨砂透明效果 */
 .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
+    background-color: rgba(55, 118, 171, 0.85) !important;
+    backdrop-filter: blur(5px) !important;
+    border-color: rgba(55, 118, 171, 0.8) !important;
 }
 
 .btn-primary:hover {
-    background-color: #2c5d8a;
-    border-color: #2c5d8a;
+    background-color: rgba(44, 93, 138, 0.9) !important;
+    border-color: rgba(44, 93, 138, 0.9) !important;
 }
 
 .btn-outline-primary {
     color: var(--primary-color);
     border-color: var(--primary-color);
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(5px) !important;
 }
 
 .btn-outline-primary:hover {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color) !important;
     color: white;
+}
+
+.btn-outline-light {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(5px) !important;
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.btn-outline-secondary {
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(5px) !important;
 }
 
 .code-header {
@@ -164,7 +201,8 @@ code {
 }
 
 .copy-btn {
-    background-color: var(--dark-color);
+    background-color: rgba(44, 62, 80, 0.85) !important;
+    backdrop-filter: blur(5px) !important;
     color: white;
     border: none;
     padding: 5px 10px;
@@ -175,13 +213,14 @@ code {
 }
 
 .copy-btn:hover {
-    background-color: #1a252f;
+    background-color: rgba(26, 37, 47, 0.9) !important;
 }
-
 
 #exercise-input textarea {
     font-family: 'Courier New', Courier, monospace;
     font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    backdrop-filter: blur(3px) !important;
 }
 
 #exercise-feedback .alert {
@@ -190,17 +229,17 @@ code {
 }
 
 #exercise-solution-area {
-    background-color: #f0f8ff;
+    background-color: rgba(240, 248, 255, 0.7) !important;
+    backdrop-filter: blur(5px) !important;
     padding: 15px;
     border-radius: 6px;
 }
-
 
 .btn-group {
     flex-shrink: 0;
 }
 
-
+/* 响应式设计保持不变 */
 @media (max-width: 992px) {
     .sidebar {
         width: 250px;
