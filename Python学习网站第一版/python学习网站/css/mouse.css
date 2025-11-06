@@ -1,0 +1,29 @@
+/* 干净的光标样式 - 无滤镜效果 */
+body, body * {
+    cursor: none !important;
+}
+
+#ghost-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-15px, -15px);
+    width: 30px;
+    height: 30px;
+    
+    /* 确保图片正常显示 */
+    object-fit: contain;
+    mix-blend-mode: normal;
+    
+    /* 如果还有白底问题，用这个轻微效果 */
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+}
+
+/* 简单的悬停效果 */
+#ghost-cursor.hover {
+    transform: translate(-15px, -15px) scale(1.2);
+}
+
+#ghost-cursor.click {
+    transform: translate(-15px, -15px) scale(0.9);
+}
