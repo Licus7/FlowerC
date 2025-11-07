@@ -22,7 +22,7 @@ body, body * {
 /* 悬停效果 - 简化版 */
 #ghost-cursor.hover {
     transform: translate(-20px, -20px) scale(1.4);
-    font-size: 36px;
+    font-size: 30px;
     text-shadow: 
         0 0 8px #ffff00,
         0 0 12px #ffff00;
