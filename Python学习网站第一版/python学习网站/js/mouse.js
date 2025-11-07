@@ -1,23 +1,16 @@
-// 幽灵光标功能
+// 方案三：表情符号幽灵光标
 function initGhostCursor() {
     // 移除旧光标
     const oldCursor = document.getElementById('ghost-cursor');
     if (oldCursor) oldCursor.remove();
     
-    // 创建幽灵光标
-    const cursor = document.createElement('img');
+    // 创建表情符号光标
+    const cursor = document.createElement('div');
     cursor.id = 'ghost-cursor';
-    cursor.src = '背景+音频/幽灵3.png';
-    cursor.alt = '幽灵光标';
-    
-    // 设置图片样式确保透明背景
-    cursor.style.width = '30px'; // 根据您的图片大小调整
-    cursor.style.height = '30px';
-    cursor.style.objectFit = 'contain';
-    
+    cursor.innerHTML = '👻'; // 幽灵表情
     document.body.appendChild(cursor);
     
-    console.log('👻 幽灵光标已加载');
+    console.log('👻 表情符号幽灵光标已创建');
     
     // 鼠标移动
     document.addEventListener('mousemove', (e) => {
@@ -26,7 +19,7 @@ function initGhostCursor() {
     });
     
     // 交互元素悬停效果
-    const interactiveElements = ['button', 'a', 'input', '.btn', '.chapter-link'];
+    const interactiveElements = ['button', 'a', 'input', 'textarea', '.btn', '.chapter-link'];
     
     interactiveElements.forEach(selector => {
         document.querySelectorAll(selector).forEach(element => {
