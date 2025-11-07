@@ -1,4 +1,4 @@
-/* 干净的光标样式 - 无滤镜效果 */
+/* 优化版：流畅的幽灵光标 */
 body, body * {
     cursor: none !important;
 }
@@ -7,23 +7,33 @@ body, body * {
     position: fixed;
     pointer-events: none;
     z-index: 999999;
-    transform: translate(-15px, -15px);
-    width: 30px;
-    height: 30px;
-    
-    /* 确保图片正常显示 */
-    object-fit: contain;
-    mix-blend-mode: normal;
-    
-    /* 如果还有白底问题，用这个轻微效果 */
-    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+    transform: translate(-20px, -20px);
+    font-size: 32px;
+    text-shadow: 
+        0 0 5px #000,
+        0 0 10px #000;
+    transition: 
+        transform 0.2s ease,
+        font-size 0.2s ease;
+    user-select: none;
+    will-change: transform; /* 性能优化 */
 }
 
-/* 简单的悬停效果 */
+/* 悬停效果 - 简化版 */
 #ghost-cursor.hover {
-    transform: translate(-15px, -15px) scale(1.2);
+    transform: translate(-20px, -20px) scale(1.4);
+    font-size: 36px;
+    text-shadow: 
+        0 0 8px #ffff00,
+        0 0 12px #ffff00;
+    /* 移除复杂动画，只用transform */
 }
 
+/* 点击效果 */
 #ghost-cursor.click {
-    transform: translate(-15px, -15px) scale(0.9);
+    transform: translate(-20px, -20px) scale(0.8);
+    font-size: 28px;
+    text-shadow: 
+        0 0 8px #6d086d,
+        0 0 12px #790b79;
 }
