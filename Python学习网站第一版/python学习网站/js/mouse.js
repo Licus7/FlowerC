@@ -7,10 +7,10 @@ function initGhostCursor() {
     // 创建表情符号光标
     const cursor = document.createElement('div');
     cursor.id = 'ghost-cursor';
-    cursor.innerHTML = '👻'; // 幽灵表情
+    cursor.innerHTML = '👾'; // 表情
     document.body.appendChild(cursor);
     
-    console.log('👻 表情符号幽灵光标已创建');
+    console.log(' 表情符号幽灵光标已创建');
     
     // 鼠标移动
     document.addEventListener('mousemove', (e) => {
