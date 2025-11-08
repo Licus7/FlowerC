@@ -35,21 +35,40 @@ class BossBattle {
         this.bgMusic = document.getElementById('bgMusic');
         this.roarSound = document.getElementById('roarSound');
         this.heroSound = document.getElementById('heroSound');
+        this.battleRainSound = document.getElementById('battleRainSound');
         
         // 设置音量
-        this.bgMusic.volume = 0.5;
-        this.roarSound.volume = 0.7;
-        this.heroSound.volume = 0.7;
+        if (this.bgMusic) this.bgMusic.volume = 0.5;
+        if (this.roarSound) this.roarSound.volume = 0.7;
+        if (this.heroSound) this.heroSound.volume = 0.7;
+        if (this.battleRainSound) this.battleRainSound.volume = 0.4;
         
         // 开始播放背景音乐
         this.playBackgroundMusic();
     }
 
-    // 播放背景音乐
+    // 添加缺失的playBackgroundMusic方法
     playBackgroundMusic() {
-        if (this.isMusicPlaying) {
+        if (this.isMusicPlaying && this.bgMusic) {
             this.bgMusic.play().catch(e => {
                 console.log('背景音乐播放失败:', e);
+            });
+        }
+    }
+
+    // 添加缺失的音频控制方法
+    stopBattleRainSound() {
+        if (this.battleRainSound) {
+            this.battleRainSound.pause();
+            this.battleRainSound.currentTime = 0;
+        }
+    }
+
+    playBattleRainSound() {
+        if (this.isMusicPlaying && this.battleRainSound) {
+            this.battleRainSound.currentTime = 0;
+            this.battleRainSound.play().catch(e => {
+                console.log('战斗雷雨音效播放失败:', e);
             });
         }
     }
@@ -60,12 +79,14 @@ class BossBattle {
         const musicBtn = document.getElementById('musicBtn');
         
         if (this.isMusicPlaying) {
-            this.bgMusic.play();
+            this.playBackgroundMusic();
+            if (this.battleRainSound) this.battleRainSound.play();
             musicBtn.textContent = '🎵 禁音';
             musicBtn.classList.remove('music-off');
             musicBtn.classList.add('music-on');
         } else {
-            this.bgMusic.pause();
+            if (this.bgMusic) this.bgMusic.pause();
+            if (this.battleRainSound) this.battleRainSound.pause();
             musicBtn.textContent = '🔇 声音';
             musicBtn.classList.remove('music-on');
             musicBtn.classList.add('music-off');
@@ -325,67 +346,68 @@ class BossBattle {
     }
 
     // 修改checkAnswer方法，添加攻击动画
-async checkAnswer(userAnswer, correctAnswer) {
-    const isCorrect = userAnswer === correctAnswer;
-    document.getElementById('questionModal').style.display = 'none';
+    async checkAnswer(userAnswer, correctAnswer) {
+        const isCorrect = userAnswer === correctAnswer;
+        document.getElementById('questionModal').style.display = 'none';
 
-    if (isCorrect) {
-        // 成功特效：攻击动画 + 白色闪屏 + 屏幕震动
-        await this.showAttackAnimation();
-        await this.slowFlash();
-        this.screenShake();
-        
-        this.attackBoss(this.currentSkill.damage);
-        this.showBattleLog(`⚡ 攻击成功！造成 ${this.currentSkill.damage} 点伤害！`, 'success');
-    } else {
-        this.showBattleLog('❌ 攻击失败！Boss闪避了攻击！', 'error');
+        if (isCorrect) {
+            // 成功特效：攻击动画 + 白色闪屏 + 屏幕震动
+            await this.showAttackAnimation();
+            await this.slowFlash();
+            this.screenShake();
+            
+            this.attackBoss(this.currentSkill.damage);
+            this.showBattleLog(`⚡ 攻击成功！造成 ${this.currentSkill.damage} 点伤害！`, 'success');
+        } else {
+            this.showBattleLog('❌ 攻击失败！Boss闪避了攻击！', 'error');
+        }
+
+        this.checkVictory();
     }
 
-    this.checkVictory();
-}
-
-// 添加攻击动画方法
-// 简单横条闪现效果
-async showAttackAnimation() {
-    return new Promise(resolve => {
-        const attackContainer = document.getElementById('heroAttack');
-        const attackImage = document.getElementById('attackImage');
-        
-        attackContainer.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 0;
-            width: 100vw;
-            height: 150px;
-            transform: translateY(-50%);
-            z-index: 1200;
-            display: block;
-            background: transparent;
-            border: none;
-            overflow: hidden;
-        `;
-        
-        attackImage.style.cssText = `
-            width: 100%;
-            height: 300px;
-            background-image: url('../背景+音频/捷拉奥拉攻击.png');
-            background-size: auto 300px;
-            background-position: top center;
-            background-repeat: no-repeat;
-            background-color: transparent;
-            position: absolute;
-            top: 0;
-            left: 0;
-            /* 直接显示并闪烁 */
-            animation: flashAppear 0.5s ease-in-out;
-        `;
-        
-        setTimeout(() => {
-            attackContainer.style.display = 'none';
-            resolve();
-        }, 500);
-    });
-}
+    // 添加攻击动画方法
+    async showAttackAnimation() {
+        return new Promise(resolve => {
+            const attackContainer = document.getElementById('heroAttack');
+            const attackImage = document.getElementById('attackImage');
+            
+            // 重置样式 - 真正横跨屏幕
+            attackContainer.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 0;
+                width: 100vw;
+                height: 250px;
+                transform: translateY(-50%);
+                z-index: 1200;
+                display: block;
+                background: transparent;
+                border: none;
+                overflow: hidden;
+            `;
+            
+            attackImage.style.cssText = `
+                width: 100vw;
+                height: 500px;
+                background-image: url('../背景+音频/捷拉奥拉攻击.png');
+                background-size: auto 500px;
+                background-position: top center;
+                background-repeat: no-repeat;
+                background-color: transparent;
+                position: absolute;
+                top: 0;
+                left: 0;
+                border-radius: 0;
+                border: none;
+                animation: fullWidthExpand 0.6s ease-out forwards, electricBar 0.15s ease-in-out infinite;
+            `;
+            
+            setTimeout(() => {
+                attackContainer.style.display = 'none';
+                resolve();
+            }, 800);
+        });
+    }
 
     // 攻击Boss
     attackBoss(damage) {
@@ -415,10 +437,59 @@ async showAttackAnimation() {
         if (this.bossHealth <= 0) {
             setTimeout(() => {
                 document.getElementById('victoryScreen').style.display = 'flex';
+                this.lazyLoadVictoryVideo();
             }, 1000);
         }
     }
 
+    // 终极稳定的视频加载方案
+   lazyLoadVictoryVideo() {
+    console.log('显示胜利界面');
+    
+    const videoContainer = document.querySelector('.victory-video-container');
+    
+    videoContainer.innerHTML = `
+        <div style="text-align: center; max-width: 800px; margin: 0 auto;">
+            <!-- 胜利庆祝标题 -->
+            <div style="color: gold; padding: 20px; background: linear-gradient(135deg, #1a237e, #0d47a1); border: 3px solid gold; border-radius: 10px; margin-bottom: 15px;">
+                <h2 style="font-size: 32px; margin: 10px 0; text-shadow: 0 0 10px #ffd700;">🎉 传说级胜利！ 🎉</h2>
+                <p style="font-size: 18px; margin: 5px 0;">恭喜击败红色暴鲤龙！</p>
+                <p style="font-size: 18px; margin: 5px 0;">你的python技能获得了不少提升！</p>
+            </div>
+            
+            <!-- 视频播放器 - 调整尺寸 -->
+            <div style="border: 3px solid #ffd700; border-radius: 10px; overflow: hidden; background: #000; margin-bottom: 15px;">
+                <video id="victoryVideo" controls 
+                       style="width: 100%; height: auto; max-height: 300px; display: block;">
+                    <source src="../背景+音频/胜利视频.mp4" type="video/mp4">
+                </video>
+            </div>
+            
+            <!-- 视频提示 -->
+            <div style="color: #ffd700; margin-bottom: 15px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                <i class="fas fa-play-circle"></i> 观看胜利时刻
+            </div>
+            
+        
+        </div>
+    `;
+    
+    // 设置视频事件
+    this.setupVideoEvents();
+}
+
+setupVideoEvents() {
+    const video = document.getElementById('victoryVideo');
+    if (video) {
+        video.addEventListener('loadeddata', () => {
+            console.log('✅ 胜利视频加载成功');
+        });
+        
+        video.addEventListener('error', (e) => {
+            console.log('视频加载错误:', e);
+        });
+    }
+}
     // 工具函数
     delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -445,7 +516,7 @@ async showAttackAnimation() {
     }
 
     // 初始化题目库
-    initializeQuestions() {
+   initializeQuestions() {
         return {
             hard: [
                 {
@@ -713,5 +784,5 @@ async showAttackAnimation() {
 
 // 初始化游戏
 document.addEventListener('DOMContentLoaded', function() {
-    new BossBattle();
+    window.bossBattle = new BossBattle();
 });
