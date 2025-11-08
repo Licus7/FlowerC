@@ -66,10 +66,11 @@ class BossBattle {
 
     playBattleRainSound() {
         if (this.isMusicPlaying && this.battleRainSound) {
-            this.battleRainSound.currentTime = 0;
-            this.battleRainSound.play().catch(e => {
-                console.log('战斗雷雨音效播放失败:', e);
-            });
+        this.battleRainSound.currentTime = 0;
+        this.battleRainSound.loop = true; // 确保循环播放
+        this.battleRainSound.play().catch(e => {
+            console.log('战斗雨声音效播放失败:', e);
+        });
         }
     }
 
@@ -171,45 +172,49 @@ class BossBattle {
     }
 
     // 战斗开始序列
+    
     async startBattleSequence() {
         if (this.isAnimating) return;
         this.isAnimating = true;
-        
+    
         document.getElementById('startBattle').disabled = true;
 
         try {
-            // 1. 屏幕变黑
-            await this.fadeToBlack();
-            
-            // 2. 播放吼叫音效（只播放一次）
-            if (!this.hasRoarPlayed) {
-                this.playRoarSound();
-                this.hasRoarPlayed = true;
-            }
-            
-            await this.showStoryText('远处传来震耳欲聋的吼声...');
-            await this.delay(2000);
-            
-            // 3. 显示帮助信息并播放捷拉奥拉音效（只播放一次）
-            if (!this.hasHeroSoundPlayed) {
-                this.playHeroSound();
-                this.hasHeroSoundPlayed = true;
-            }
-            
-            await this.showStoryText('伴随着雷电划过，传说中的宝可梦来帮助你了！');
-            await this.delay(1500);
-            
-            // 4. 显示捷拉奥拉
-            await this.showHeroPokemon();
-            await this.delay(1500);
-            
-            // 5. 进入战斗界面
-            this.enterBattleScene();
-            
+        // 在战斗开始时只播放雨声音效（循环）
+        this.playBattleRainSound();
+        
+        // 1. 屏幕变黑
+        await this.fadeToBlack();
+        
+        // 2. 播放吼叫音效（只播放一次）
+        if (!this.hasRoarPlayed) {
+            this.playRoarSound();
+            this.hasRoarPlayed = true;
+        }
+        
+        await this.showStoryText('远处传来震耳欲聋的吼声...');
+        await this.delay(2000);
+        
+        // 3. 显示帮助信息并播放捷拉奥拉音效（只播放一次）
+        if (!this.hasHeroSoundPlayed) {
+            this.playHeroSound();
+            this.hasHeroSoundPlayed = true;
+        }
+        
+        await this.showStoryText('传说中的宝可梦来帮助你了！');
+        await this.delay(1500);
+        
+        // 4. 显示捷拉奥拉
+        await this.showHeroPokemon();
+        await this.delay(1500);
+        
+        // 5. 进入战斗界面
+        this.enterBattleScene();
+        
         } catch (error) {
-            console.error('动画序列错误:', error);
+        console.error('动画序列错误:', error);
         } finally {
-            this.isAnimating = false;
+        this.isAnimating = false;
         }
     }
 

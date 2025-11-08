@@ -660,9 +660,6 @@
 </head>
 <body>
     <!-- 音频元素 -->
-    <audio id="bgMusic" loop>
-        <source src="../背景+音频/雷雨.mp3" type="audio/mpeg">
-    </audio>
     <audio id="roarSound">
         <source src="../背景+音频/暴鲤龙.mp3" type="audio/mpeg">
     </audio>
@@ -681,23 +678,26 @@
     <!-- 玩法说明界面 -->
     <div class="boss-container" id="tutorialScreen">
         <div class="tutorial-box">
-            <h2>Boss--愤怒之湖--暴鲤龙</h2>
+            <h2>Boss--“愤怒之湖”--暴鲤龙</h2>
             <div class="boss-health-bar mt-4">
                 <div class="health-fill" style="width: 100%;"></div>
             </div>
             <p class="mt-3"><strong>Boss血量：1000 HP</strong></p>
             
             <div class="mt-4 text-start">
-                <h5>战斗规则：</h5>
+                <p class="text-muted"><strong>你整天百无聊赖，厌倦了城市的生活，在没有你目的地的冒险的途中，你路过了一个小镇，
+                    小镇的北端是一个大湖，居民们靠捕鱼为生，但最近几年关于湖中那个庞然大物的恶讯频频流传..
+                    那红色的怪物无差别攻击靠近湖泊的人们，从此湖泊便被称为“愤怒之湖”，你打算去帮助居民解决灾难...</strong></p>
+                <p class="text-muted"></p>
+                <p class="text-muted"><strong></strong></p>
+                <h5>规则：</h5>
                 <ul class="list-unstyled">
-                    <li> <strong>开始后你的屏幕下方会出现以下技能：</strong> </li>
-                    <li> 等离子闪电拳 - 难题 (100伤害)</li>
-                    <li> 波导弹 - 中等题 (80伤害)</li>
-                    <li> 雷电拳 - 简单题 (75伤害)</li>
-                    <li> 电光一闪 - 判断题 (40伤害)</li>
+                    <li> <strong># 不同的技能对应不同难度的题目和威力，选择技能后需要进行答题测试</strong> </li>
+                    <li> <strong># 答对题目才能造成伤害，答错则攻击失败。努力让暴鲤龙冷静下来吧！！</strong> </li>
+                    <li> <strong># 本页面包含音效以及背景音🔊建议亮度调低音量调高🔊</strong></li>
+                    
                 </ul>
-                <p class="text-muted"><strong># 答对题目才能造成伤害，答错则攻击失败。努力让暴鲤龙冷静下来吧！！</strong></p>
-                <p class="text-muted"><strong># 本页面包含音效以及背景音🔊建议亮度调低音量调高🔊</strong></p>
+                
             </div>
             
             <button class="btn btn-danger btn-lg mt-4" id="startBattle">
@@ -767,7 +767,6 @@
     <!-- 剧情文本 -->
     <div class="story-text" id="storyText">
         <h3>伴随着雷电划过，传说中的宝可梦来帮助你了！</h3>
-        <p>它感受到了你的决心，前来助战！</p>
     </div>
     
     <!-- 英雄宝可梦展示 -->
