@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss--愤怒之湖--暴鲤龙</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Boss战专属样式 */
+        .boss-container {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a237e 0%, #0d47a1 100%);
+            position: relative;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+        
+        /* 黑色过渡效果 */
+        .screen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 1s;
+            pointer-events: none;
+        }
+        
+        .screen-overlay.active {
+            opacity: 1;
+        }
+        
+        .white-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1001;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* 玩法说明框 */
+        .tutorial-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 100px auto;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            border: 3px solid #ff6b6b;
+            position: relative;
+            z-index: 100;
+        }
+        
+        /* 像素风格血条 */
+        .boss-health {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 600px;
+            z-index: 500;
+        }
+        
+        .health-text {
+            color: white;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+            text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        .boss-health-bar {
+            background: #000;
+            height: 24px;
+            border: 4px solid #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 0 2px #000, 0 0 10px rgba(255,0,0,0.8);
+        }
+        
+        .health-fill {
+            background: #ff0000;
+            height: 100%;
+            width: 100%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+        
+        .health-fill::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(255,255,255,0.3) 2px,
+                rgba(255,255,255,0.3) 4px
+            );
+        }
+        
+        /* 战斗界面 */
+        .battle-scene {
+            position: relative;
+            min-height: 100vh;
+            display: none;
+            overflow: hidden;
+        }
+        
+        .boss-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .background-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 2;
+        }
+        
+        /* 雨滴效果 */
+        .rain {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3;
+        }
+        
+        .rain-drop {
+            position: absolute;
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            animation: rainFall 1s linear infinite;
+        }
+        
+        @keyframes rainFall {
+            0% { transform: translateY(-100px) translateX(0); opacity: 1; }
+            100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
+        }
+
+        /* 技能容器 - 半透明 */
+        .skills-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 95%;
+    max-width: 600px;
+    z-index: 400;
+    background: transparent;
+    border: 4px solid #000;
+    padding: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+        .skill-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .skill-btn {
+            padding: 20px 15px;
+            border: 3px solid;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 2px 2px 0 #000;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            background: #333;
+            position: relative;
+            box-shadow: 
+                inset 0 0 0 2px rgba(255,255,255,0.1),
+                0 4px 0 rgba(0,0,0,0.8);
+            border-radius: 0;
+            text-align: center;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .skill-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                inset 0 0 0 2px rgba(255,255,255,0.3),
+                0 6px 0 rgba(0,0,0,0.8);
+        }
+
+        .skill-btn:active {
+            transform: translateY(2px);
+            box-shadow: 
+                inset 0 0 0 2px rgba(0,0,0,0.5),
+                0 2px 0 rgba(0,0,0,0.8);
+        }
+
+        .skill-btn::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border: 1px solid rgba(255,255,255,0.2);
+            pointer-events: none;
+        }
+
+        /* 技能颜色 */
+        .skill-1 { 
+            background: #efdc49;
+            border-color: #f7c10f;
+        }
+
+        .skill-2 { 
+            background: #a25104;
+            border-color: #b26c04;
+        }
+
+        .skill-3 { 
+            background: #efdc49;
+            border-color: #f7c10f;
+        }
+
+        .skill-4 { 
+            background: #a8a996;
+            border-color: #86867f;
+        }
+
+        /* 捷拉奥拉图片容器 */
+        .hero-pokemon {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1200;
+            display: none;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 20px;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 0 4px #000, 0 0 30px rgba(255,215,0,0.5);
+        }
+
+        .hero-image {
+            width: 320px;
+            height: 320px;
+            border: 2px solid #ffd700;
+            margin: 0 auto;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .hero-pokemon p {
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 1px 1px 0 #000;
+            margin: 15px 0 0 0;
+            font-size: 16px;
+        }
+
+        /* 控制面板放在右下角 */
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 400;
+            background: rgba(44, 62, 80, 0.8);
+            border: 3px solid rgba(236, 240, 241, 0.8);
+            padding: 10px;
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.8), 0 0 15px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 200px;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-btn {
+            padding: 12px 8px;
+            border: 2px solid #000;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 0 #000;
+            font-size: 12px;
+            font-family: 'Courier New', monospace;
+            background: #175ea5;
+            text-align: center;
+            border-radius: 0;
+        }
+
+        .control-btn:hover {
+            background: #95a5a6;
+            transform: translateY(-1px);
+        }
+
+        .control-btn:active {
+            transform: translateY(1px);
+        }
+
+        /* 音乐按钮状态 */
+        .music-on {
+            background: #085e2c;
+        }
+
+        .music-off {
+            background: #6f1107;
+        }
+
+        /* 菜单弹窗 */
+        .menu-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2c3e50;
+            padding: 20px;
+            border: 3px solid #ecf0f1;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 0 0 3px #000, 0 0 20px rgba(0,0,0,0.8);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .menu-btn {
+            padding: 12px;
+            border: 2px solid #000;
+            background: #7f8c8d;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: #95a5a6;
+        }
+
+        .continue-btn {
+            background: #27ae60;
+        }
+
+        .quit-btn {
+            background: #e74c3c;
+        }
+
+        /* 两侧装饰元素 */
+        .side-decoration {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 150px;
+            z-index: 5;
+            background: linear-gradient(90deg, 
+                rgba(0,0,0,0.8) 0%, 
+                transparent 50%, 
+                rgba(0,0,0,0.8) 100%);
+            pointer-events: none;
+        }
+
+        .side-left {
+            left: 0;
+            background: linear-gradient(90deg, 
+                rgba(0,0,0,0.7) 0%, 
+                transparent 100%);
+        }
+
+        .side-right {
+            right: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(0,0,0,0.7) 100%);
+        }
+
+        /* 屏幕震动效果 */
+        @keyframes screenShake {
+            0% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-5px) translateY(-3px); }
+            50% { transform: translateX(5px) translateY(3px); }
+            75% { transform: translateX(-3px) translateY(-2px); }
+            100% { transform: translateX(0) translateY(0); }
+        }
+
+        .screen-shake {
+            animation: screenShake 0.5s ease-in-out;
+        }
+
+        /* 缓慢白色闪屏 */
+        .slow-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 1002;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes slowFlash {
+            0% { opacity: 0; }
+            25% { opacity: 0.6; }
+            50% { opacity: 0; }
+            75% { opacity: 0.4; }
+            100% { opacity: 0; }
+        }
+        
+        /* 题目弹窗 */
+        .question-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2c3e50;
+            padding: 25px;
+            border: 4px solid #ecf0f1;
+            z-index: 1000;
+            max-width: 500px;
+            width: 90%;
+            display: none;
+            box-shadow: 0 0 0 4px #000, 0 0 30px rgba(0,0,0,0.8);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .question-content {
+            margin-bottom: 20px;
+            color: #ecf0f1;
+            text-shadow: 1px 1px 0 #000;
+        }
+        
+        .question-content h4 {
+            color: #f39c12;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .question-content p {
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: center;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option-btn {
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            background: #34495e;
+            color: #ecf0f1;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-size: 13px;
+            text-shadow: 1px 1px 0 #000;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .option-btn:hover {
+            background: #4a6b8a;
+            border-color: #f39c12;
+        }
+        
+        /* 战斗信息 */
+        .battle-log {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            text-align: center;
+            z-index: 450;
+            display: none;
+            border: 2px solid #fff;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        
+        /* 胜利界面 */
+        .victory-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .victory-message {
+            font-size: 36px;
+            margin-bottom: 30px;
+            color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            font-weight: bold;
+        }
+        
+        /* 剧情文本 */
+        .story-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            z-index: 1100;
+            display: none;
+            max-width: 500px;
+            width: 90%;
+            border: 3px solid #fff;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 捷拉奥拉攻击动画 */
+/* 修复后的攻击动画 */
+.hero-attack {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    z-index: 1200;
+    display: none;
+}
+
+.attack-image {
+    width: 200px;
+    height: 200px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+/* 攻击移动动画 */
+.attack-moving {
+    animation: attackMove 1.5s ease-in-out forwards;
+}
+
+@keyframes flashAppear {
+    0% {
+        opacity: 0;
+        filter: brightness(0.5);
+    }
+    25% {
+        opacity: 1;
+        filter: brightness(2);
+    }
+    50% {
+        opacity: 1;
+        filter: brightness(1.5);
+    }
+    75% {
+        opacity: 1;
+        filter: brightness(2);
+    }
+    100% {
+        opacity: 1;
+        filter: brightness(1);
+    }
+}
+
+/* 电击特效 */
+.electric {
+    animation: electricEffect 0.2s ease-in-out infinite;
+}
+
+@keyframes electricEffect {
+    0%, 100% { 
+        filter: drop-shadow(0 0 8px #ffd700) 
+                brightness(1) 
+                hue-rotate(0deg);
+    }
+    50% { 
+        filter: drop-shadow(0 0 20px #36360f) 
+                brightness(1.4) 
+                hue-rotate(30deg);
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- 音频元素 -->
+    <audio id="bgMusic" loop>
+        <source src="../背景+音频/雷雨.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="roarSound">
+        <source src="../背景+音频/暴鲤龙.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="heroSound">
+        <source src="../背景+音频/捷拉奥拉.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 黑色遮罩层 -->
+    <div class="screen-overlay" id="screenOverlay"></div>
+    <div class="white-flash" id="whiteFlash"></div>
+    <div class="slow-flash" id="slowFlash"></div>
+    
+    <!-- 玩法说明界面 -->
+    <div class="boss-container" id="tutorialScreen">
+        <div class="tutorial-box">
+            <h2>Boss--愤怒之湖--暴鲤龙</h2>
+            <div class="boss-health-bar mt-4">
+                <div class="health-fill" style="width: 100%;"></div>
+            </div>
+            <p class="mt-3"><strong>Boss血量：1000 HP</strong></p>
+            
+            <div class="mt-4 text-start">
+                <h5>战斗规则：</h5>
+                <ul class="list-unstyled">
+                    <li>⚡<strong>等离子闪电拳</strong>⚡ - 难题 (100伤害)</li>
+                    <li> <strong>波导弹</strong> - 中等题 (80伤害)</li>
+                    <li> <strong>雷电拳</strong> - 简单题 (75伤害)</li>
+                    <li> <strong>电光一闪</strong> - 判断题 (40伤害)</li>
+                </ul>
+                <p class="text-muted">答对题目才能造成伤害，答错则攻击失败！</p>
+            </div>
+            
+            <button class="btn btn-danger btn-lg mt-4" id="startBattle">
+                <i class="fas fa-play"></i> 开始挑战
+            </button>
+        </div>
+    </div>
+    
+    <!-- 战斗界面 -->
+    <div class="battle-scene" id="battleScene">
+        <!-- 全屏Boss背景图片 -->
+        <div class="boss-background" id="bossBackground"></div>
+        <div class="background-overlay"></div>
+        
+        <!-- 两侧装饰 -->
+        <div class="side-decoration side-left"></div>
+        <div class="side-decoration side-right"></div>
+        
+        <div class="rain" id="rainEffect"></div>
+        
+        <!-- Boss血条 -->
+        <div class="boss-health">
+            <div class="health-text">红色暴鲤龙 HP: <span id="currentHealth">1000</span>/1000</div>
+            <div class="boss-health-bar">
+                <div class="health-fill" id="healthFill" style="width: 100%;"></div>
+            </div>
+        </div>
+        
+        <!-- 技能按钮 -->
+        <div class="skills-container">
+            <div class="skill-buttons">
+                <button class="skill-btn skill-1" data-skill="plasma" data-damage="100">
+                    ⚡ 等离子闪电拳 ⚡<br><small>难题 - 100伤害</small>
+                </button>
+                <button class="skill-btn skill-2" data-skill="wave" data-damage="80">
+                     波导弹<br><small>中等题 - 80伤害</small>
+                </button>
+                <button class="skill-btn skill-3" data-skill="thunder" data-damage="75">
+                     雷电拳<br><small>简单题 - 75伤害</small>
+                </button>
+                <button class="skill-btn skill-4" data-skill="quick" data-damage="40">
+                     电光一闪<br><small>判断题 - 40伤害</small>
+                </button>
+            </div>
+        </div>
+        
+        <div class="control-panel" id="controlPanel" style="display: none;">
+            <button class="control-btn" id="menuBtn">菜单</button>
+            <button class="control-btn music-on" id="musicBtn">🎵 关闭声音</button>
+        </div>
+
+        <!-- 战斗信息 -->
+        <div class="battle-log" id="battleLog"></div>
+    </div>
+
+    <!-- 题目弹窗 -->
+    <div class="question-modal" id="questionModal">
+        <div class="question-content">
+            <h4 id="questionTitle">题目</h4>
+            <p id="questionText"></p>
+        </div>
+        <div class="options-container" id="optionsContainer">
+            <!-- 选项会动态生成 -->
+        </div>
+    </div>
+    
+    <!-- 剧情文本 -->
+    <div class="story-text" id="storyText">
+        <h3>传说中的宝可梦来帮助你了！</h3>
+        <p>捷拉奥拉感受到了你的决心，前来助战！</p>
+    </div>
+    
+    <!-- 英雄宝可梦展示 -->
+    <div class="hero-pokemon" id="heroPokemon">
+        <div class="hero-image" id="heroImage"></div>
+        <p>传说中的宝可梦加入战斗！</p>
+    </div>
+    
+    <!-- 菜单弹窗 -->
+    <div class="menu-modal" id="menuModal">
+        <h4>游戏菜单</h4>
+        <div class="menu-buttons">
+            <button class="menu-btn continue-btn" id="continueBtn">继续游戏</button>
+            <button class="menu-btn quit-btn" id="quitBtn">退出游戏</button>
+        </div>
+    </div>
+    
+    <!-- 胜利界面 -->
+    <div class="victory-screen" id="victoryScreen">
+        <div class="victory-message">🎉 胜利！ 🎉</div>
+        <p>你成功击败了红色暴鲤龙！</p>
+        <div class="mt-4">
+            <!-- 这里可以放置胜利视频 -->
+            <div style="width: 400px; height: 300px; background: #333; display: flex; align-items: center; justify-content: center; color: white; border: 3px solid #ffd700;">
+                胜利视频播放区域<br>
+                (替换为胜利.mp4)
+            </div>
+        </div>
+        <button class="btn btn-success btn-lg mt-4" onclick="window.location.href='start.html'">
+            <i class="fas fa-home"></i> 返回首页<>
+        </button>
+    </div>
+
+    <!-- 捷拉奥拉攻击动画 -->
+<div class="hero-attack" id="heroAttack">
+    <div class="attack-image" id="attackImage"></div>
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="boss.js"></script>
+</body>
+</html>
