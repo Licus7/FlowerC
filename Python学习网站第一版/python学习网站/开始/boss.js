@@ -196,7 +196,7 @@ class BossBattle {
                 this.hasHeroSoundPlayed = true;
             }
             
-            await this.showStoryText('传说中的宝可梦来帮助你了！');
+            await this.showStoryText('伴随着雷电划过，传说中的宝可梦来帮助你了！');
             await this.delay(1500);
             
             // 4. 显示捷拉奥拉
@@ -273,19 +273,42 @@ class BossBattle {
         });
     }
 
-    // 添加屏幕震动效果
-    screenShake() {
-        if (this.isShaking) return;
-        this.isShaking = true;
+    // 添加屏幕震动效果 + 受击音效
+// 添加屏幕震动效果 + 受击音效
+screenShake() {
+    if (this.isShaking) return;
+    this.isShaking = true;
     
+    // 先播放受击音效
+    this.playHitSound();
+    
+    // 音效播放后稍微延迟再开始震动（让音效先出来）
+    setTimeout(() => {
         const battleScene = document.getElementById('battleScene');
         battleScene.classList.add('screen-shake');
-    
+
         setTimeout(() => {
             battleScene.classList.remove('screen-shake');
             this.isShaking = false;
         }, 500);
+    }, 200); // 延迟200毫秒开始震动
+}
+
+// 受击音效方法
+playHitSound() {
+    if (this.roarSound) {
+        this.roarSound.currentTime = 1.6; // 从0.9秒开始，避免长前奏
+        this.roarSound.volume = 0.5; // 音量调低一些
+        this.roarSound.play().catch(e => {
+            console.log('受击音效播放失败:', e);
+        });
+        
+        // 1秒后恢复原始音量
+        setTimeout(() => {
+            this.roarSound.volume = 0.7;
+        }, 1000);
     }
+}
 
     // 添加缓慢白色闪屏
     slowFlash() {
@@ -345,21 +368,20 @@ class BossBattle {
         document.getElementById('questionModal').style.display = 'block';
     }
 
-    // 修改checkAnswer方法，添加攻击动画
     async checkAnswer(userAnswer, correctAnswer) {
         const isCorrect = userAnswer === correctAnswer;
         document.getElementById('questionModal').style.display = 'none';
 
         if (isCorrect) {
-            // 成功特效：攻击动画 + 白色闪屏 + 屏幕震动
-            await this.showAttackAnimation();
-            await this.slowFlash();
-            this.screenShake();
-            
-            this.attackBoss(this.currentSkill.damage);
-            this.showBattleLog(`⚡ 攻击成功！造成 ${this.currentSkill.damage} 点伤害！`, 'success');
+        // 成功特效：攻击动画 + 白色闪屏 + 屏幕震动
+        await this.showAttackAnimation();
+        await this.slowFlash();
+        this.screenShake();  // <-- 这里调用屏幕震动
+        
+        this.attackBoss(this.currentSkill.damage);
+        this.showBattleLog(`⚡ 攻击成功！造成 ${this.currentSkill.damage} 点伤害！`, 'success');
         } else {
-            this.showBattleLog('❌ 攻击失败！Boss闪避了攻击！', 'error');
+        this.showBattleLog('❌ 攻击失败！Boss闪避了攻击！', 'error');
         }
 
         this.checkVictory();
