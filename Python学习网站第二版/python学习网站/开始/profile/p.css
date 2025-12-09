@@ -1,0 +1,592 @@
+/* 重置和基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* 导航栏 */
+.navbar {
+    background: linear-gradient(90deg, #4a6bff 0%, #6a8eff 100%);
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 4px 12px rgba(74, 107, 255, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 1.8rem;
+    font-weight: 700;
+    gap: 10px;
+}
+
+.logo i {
+    font-size: 2rem;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+    padding: 8px 15px;
+    border-radius: 20px;
+}
+
+.nav-links a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 500;
+}
+
+.avatar-small {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.avatar-small:hover {
+    transform: scale(1.1);
+}
+
+/* 主布局 */
+.main-container {
+    display: flex;
+    gap: 30px;
+    padding: 30px 20px;
+}
+
+.sidebar {
+    flex: 0 0 300px;
+}
+
+.main-content {
+    flex: 1;
+}
+
+/* 个人资料卡片 */
+.profile-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.avatar-container {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+}
+
+.avatar-large {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+    transition: all 0.3s;
+}
+
+.avatar-large:hover {
+    transform: scale(1.05);
+}
+
+.avatar-upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: #4a6bff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    border: 3px solid white;
+    transition: all 0.3s;
+}
+
+.avatar-upload-btn:hover {
+    background: #3a5bff;
+    transform: scale(1.1);
+}
+
+.profile-card h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.user-title {
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    font-weight: 500;
+}
+
+/* 统计信息 */
+.stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 25px 0;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #4a6bff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+/* 进度条 */
+.progress-container {
+    margin-top: 25px;
+}
+
+.progress-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.progress-bar {
+    height: 10px;
+    background: #ecf0f1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4a6bff 0%, #6a8eff 100%);
+    width: 0%;
+    border-radius: 5px;
+    transition: width 1s ease-in-out;
+}
+
+/* 快捷链接 */
+.quick-links {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.quick-links h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+}
+
+.quick-links ul {
+    list-style: none;
+}
+
+.quick-links li {
+    margin-bottom: 15px;
+}
+
+.quick-links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #4a6bff;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.quick-links a:hover {
+    background: #f8f9ff;
+    transform: translateX(5px);
+}
+
+.quick-links i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* 认证区域 */
+.auth-section {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.auth-card {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.auth-card h2 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    font-family: 'Poppins', sans-serif;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4a6bff;
+    box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.checkbox-group input {
+    width: auto;
+}
+
+/* 按钮 */
+.btn-primary {
+    background: linear-gradient(90deg, #4a6bff 0%, #6a8eff 100%);
+    color: white;
+    border: none;
+    padding: 16px 30px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(74, 107, 255, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: #4a6bff;
+    border: 2px solid #4a6bff;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-secondary:hover {
+    background: #4a6bff;
+    color: white;
+}
+
+/* 头像选项 */
+.avatar-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.avatar-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.avatar-option:hover {
+    background: #f8f9ff;
+}
+
+.avatar-option.selected {
+    background: #eef2ff;
+    border: 2px solid #4a6bff;
+}
+
+.avatar-preview {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+}
+
+.avatar-preview.default {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-preview.colorful {
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+}
+
+.avatar-preview.gradient {
+    background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.avatar-preview.upload {
+    background: #ecf0f1;
+    color: #7f8c8d;
+}
+
+/* 仪表板 */
+.welcome-banner {
+    background: linear-gradient(90deg, #4a6bff 0%, #6a8eff 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+.welcome-banner h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background: #f8f9ff;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.card-header h3 {
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 25px 30px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #7f8c8d;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #2c3e50;
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+/* 响应式设计 */
+@media (max-width: 1024px) {
+    .main-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        flex: none;
+        width: 100%;
+    }
+    
+    .nav-links {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .auth-section {
+        padding: 25px;
+    }
+    
+    .profile-card,
+    .quick-links {
+        padding: 20px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-banner h1 {
+        font-size: 1.8rem;
+    }
+}

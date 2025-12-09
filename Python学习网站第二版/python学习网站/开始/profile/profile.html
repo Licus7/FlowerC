@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人档案</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-brown: #A0522D;
+            --light-brown: #D2B48C;
+            --dark-brown: #8B4513;
+            --bg-color: #F5F5DC;
+            --card-bg: #FFF8DC;
+            --text-dark: #333;
+            --text-light: #666;
+            --success-green: #28a745;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(160, 82, 45, 0.1);
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        /* 返回按钮 */
+        .back-retro {
+            display: inline-block;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, var(--primary-brown), var(--dark-brown));
+            color: white !important;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(139, 69, 19, 0.3);
+            transition: all 0.3s;
+        }
+
+        .back-retro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(139, 69, 19, 0.4);
+            color: white;
+        }
+
+        /* 头部区域 */
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 2px solid var(--light-brown);
+            margin-bottom: 30px;
+        }
+
+        .profile-img-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .profile-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-brown);
+            color: white;
+            border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .edit-avatar-btn:hover {
+            background: var(--dark-brown);
+            transform: scale(1.1);
+        }
+
+        h1 {
+            color: var(--primary-brown);
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 个人信息卡片 */
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--light-brown);
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.1);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-brown);
+        }
+
+        .info-label {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark-brown);
+        }
+
+        .info-value {
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--dark-brown);
+        }
+
+        /* 编辑按钮 */
+        .edit-btn {
+            padding: 8px 20px;
+            background: linear-gradient(to right, var(--primary-brown), var(--dark-brown));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(160, 82, 45, 0.3);
+        }
+
+        /* 编辑表单 */
+        .edit-form {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid var(--light-brown);
+            display: none;
+        }
+
+        .edit-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid var(--light-brown);
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-brown);
+            box-shadow: 0 0 0 0.2rem rgba(160, 82, 45, 0.25);
+        }
+
+        /* 性别选择 */
+        .gender-selection {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .gender-option {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            padding: 15px;
+            border: 2px solid var(--light-brown);
+            border-radius: 10px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .gender-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-brown);
+        }
+
+        .gender-option.selected {
+            background: linear-gradient(135deg, var(--light-brown), var(--primary-brown));
+            color: white;
+            border-color: var(--primary-brown);
+        }
+
+        .gender-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        /* 按钮组 */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn-save {
+            flex: 2;
+            padding: 12px;
+            background: linear-gradient(to right, var(--success-green), #218838);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        /* 经验进度条 */
+        .progress-container {
+            margin: 20px 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .progress {
+            height: 20px;
+            border-radius: 10px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-brown), #FFA500);
+            transition: width 0.5s ease;
+        }
+
+        /* 朋友列表 */
+        .friends-section {
+            margin-top: 40px;
+        }
+
+        .friends-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .friend-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--light-brown);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .friend-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(139, 69, 19, 0.15);
+        }
+
+        .friend-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid var(--light-brown);
+        }
+
+        /* 登出按钮 */
+        #logoutButton {
+            margin-top: 20px;
+            padding: 12px 40px;
+            background: linear-gradient(to right, #dc3545, #c82333);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .gender-selection {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .friends-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+        /* 保存提示 */
+        .save-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success-green);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .save-notification.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 返回按钮 -->
+        <a href="../../menu.html" class="back-retro">
+            <i class="fas fa-arrow-left"></i> 返回菜单
+        </a>
+
+        <!-- 头部区域 -->
+        <header>
+            <div class="profile-img-container">
+                <img id="avatarImg" src="https://api.dicebear.com/7.x/avataaars/svg?seed=用户" alt="头像" class="profile-img">
+                <div class="edit-avatar-btn" onclick="changeAvatar()">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <h1>角色档案</h1>
+        </header>
+
+        <!-- 个人信息显示区 -->
+        <div class="profile-card">
+            <div class="info-item">
+                <span class="info-label">用户名:</span>
+                <span class="info-value" id="usernameDisplay">未设置</span>
+                <button class="edit-btn" onclick="editField('username')">
+                    <i class="fas fa-edit"></i> 编辑
+                </button>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">角色ID:</span>
+                <span class="info-value" id="userIdDisplay">未设置</span>
+                <button class="edit-btn" onclick="editField('userId')">
+                    <i class="fas fa-edit"></i> 编辑
+                </button>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">性别:</span>
+                <span class="info-value" id="genderDisplay">未设置</span>
+                <button class="edit-btn" onclick="editField('gender')">
+                    <i class="fas fa-edit"></i> 编辑
+                </button>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">密码:</span>
+                <span class="info-value">••••••••</span>
+                <button class="edit-btn" onclick="editField('password')">
+                    <i class="fas fa-edit"></i> 修改
+                </button>
+            </div>
+
+            <!-- 经验进度条 -->
+            <div class="progress-container">
+                <div class="progress-label">
+                    <span>经验值</span>
+                    <span id="experienceText">0/1000 XP</span>
+                </div>
+                <div class="progress">
+                    <div id="experienceBar" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">已完成课程:</span>
+                <span class="info-value" id="lessonDisplay">0/100</span>
+            </div>
+        </div>
+
+        <!-- 编辑表单 -->
+        <div id="editForm" class="edit-form">
+            <h3 id="editTitle" style="color: var(--primary-brown); margin-bottom: 20px;">编辑信息</h3>
+            
+            <div id="usernameEdit" class="form-group">
+                <label class="form-label">用户名:</label>
+                <input type="text" id="usernameInput" class="form-control" placeholder="请输入用户名">
+            </div>
+
+            <div id="userIdEdit" class="form-group" style="display: none;">
+                <label class="form-label">角色ID:</label>
+                <input type="text" id="userIdInput" class="form-control" placeholder="请输入角色ID">
+            </div>
+
+            <div id="genderEdit" class="form-group" style="display: none;">
+                <label class="form-label">性别:</label>
+                <div class="gender-selection">
+                    <div class="gender-option" onclick="selectGender('male')">
+                        <div class="gender-icon">👨</div>
+                        <div>男性</div>
+                    </div>
+                    <div class="gender-option" onclick="selectGender('female')">
+                        <div class="gender-icon">👩</div>
+                        <div>女性</div>
+                    </div>
+                    <div class="gender-option" onclick="selectGender('other')">
+                        <div class="gender-icon">🧑</div>
+                        <div>其他</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="passwordEdit" class="form-group" style="display: none;">
+                <label class="form-label">新密码:</label>
+                <input type="password" id="passwordInput" class="form-control" placeholder="请输入新密码">
+                <label class="form-label mt-3">确认密码:</label>
+                <input type="password" id="passwordConfirm" class="form-control" placeholder="请再次输入密码">
+            </div>
+
+            <div class="button-group">
+                <button class="btn-save" onclick="saveChanges()">
+                    <i class="fas fa-save"></i> 保存更改
+                </button>
+                <button class="btn-cancel" onclick="cancelEdit()">
+                    <i class="fas fa-times"></i> 取消
+                </button>
+            </div>
+        </div>
+
+        <!-- 朋友列表 -->
+        <div class="friends-section">
+            <h2 style="color: var(--primary-brown);">我的好友</h2>
+            <div id="friendsList" class="friends-list">
+                <!-- 好友会动态加载 -->
+            </div>
+        </div>
+
+        <!-- 登出按钮 -->
+        <button id="logoutButton" class="btn btn-danger mt-4">
+            <i class="fas fa-sign-out-alt"></i> 登出账户
+        </button>
+    </div>
+
+    <!-- 保存成功提示 -->
+    <div id="saveNotification" class="save-notification">
+        <i class="fas fa-check-circle"></i> 保存成功！
+    </div>
+
+    <script>
+        // 用户数据
+        let userData = {
+            username: localStorage.getItem('userProfile_username') || '张三',
+            userId: localStorage.getItem('userProfile_userId') || 'ID_001',
+            gender: localStorage.getItem('userProfile_gender') || 'male',
+            password: localStorage.getItem('userProfile_password') || '123456',
+            experience: parseInt(localStorage.getItem('userProfile_experience')) || 350,
+            maxExperience: 1000,
+            lessonsCompleted: parseInt(localStorage.getItem('userProfile_lessonsCompleted')) || 25,
+            totalLessons: 100,
+            friends: JSON.parse(localStorage.getItem('userProfile_friends')) || [
+                { name: '李四', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=李四' },
+                { name: '王五', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=王五' },
+                { name: '赵六', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=赵六' },
+                { name: '小红', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=小红' }
+            ]
+        };
+
+        // 当前编辑的字段
+        let currentEditField = '';
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+            renderFriends();
+            updateExperienceBar();
+        });
+
+        // 加载用户数据到页面
+        function loadUserData() {
+            // 设置显示值
+            document.getElementById('usernameDisplay').textContent = userData.username;
+            document.getElementById('userIdDisplay').textContent = userData.userId;
+            document.getElementById('genderDisplay').textContent = getGenderText(userData.gender);
+            document.getElementById('lessonDisplay').textContent = `${userData.lessonsCompleted}/${userData.totalLessons}`;
+            document.getElementById('experienceText').textContent = `${userData.experience}/${userData.maxExperience} XP`;
+            
+            // 更新头像
+            document.getElementById('avatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.userId}`;
+            
+            // 更新进度条
+            const percentage = (userData.experience / userData.maxExperience) * 100;
+            document.getElementById('experienceBar').style.width = `${percentage}%`;
+        }
+
+        // 获取性别文本
+        function getGenderText(gender) {
+            const genderMap = {
+                'male': '男性',
+                'female': '女性',
+                'other': '其他'
+            };
+            return genderMap[gender] || '未设置';
+        }
+
+        // 编辑字段
+        function editField(field) {
+            currentEditField = field;
+            
+            // 隐藏所有编辑区域
+            document.querySelectorAll('#editForm .form-group').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // 显示当前编辑区域
+            document.getElementById(`${field}Edit`).style.display = 'block';
+            
+            // 设置表单标题
+            const titles = {
+                'username': '编辑用户名',
+                'userId': '编辑角色ID',
+                'gender': '选择性别',
+                'password': '修改密码'
+            };
+            document.getElementById('editTitle').textContent = titles[field] || '编辑信息';
+            
+            // 预填当前值
+            if (field === 'username') {
+                document.getElementById('usernameInput').value = userData.username;
+            } else if (field === 'userId') {
+                document.getElementById('userIdInput').value = userData.userId;
+            } else if (field === 'gender') {
+                // 选中当前性别
+                document.querySelectorAll('.gender-option').forEach(el => {
+                    el.classList.remove('selected');
+                });
+                // 根据当前性别选中对应选项
+                const genderOption = document.querySelector(`[onclick="selectGender('${userData.gender}')"]`);
+                if (genderOption) {
+                    genderOption.classList.add('selected');
+                }
+            }
+            
+            // 显示编辑表单
+            document.getElementById('editForm').classList.add('active');
+            
+            // 滚动到编辑区域
+            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 选择性别
+        function selectGender(gender) {
+            // 移除所有选中状态
+            document.querySelectorAll('.gender-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // 添加选中状态到点击的元素
+            const clickedElement = event.target.closest('.gender-option');
+            clickedElement.classList.add('selected');
+            
+            // 更新数据
+            userData.gender = gender;
+        }
+
+        // 保存更改
+        function saveChanges() {
+            let isValid = true;
+            
+            if (currentEditField === 'username') {
+                const newUsername = document.getElementById('usernameInput').value.trim();
+                if (newUsername) {
+                    userData.username = newUsername;
+                } else {
+                    alert('用户名不能为空！');
+                    isValid = false;
+                }
+            } else if (currentEditField === 'userId') {
+                const newUserId = document.getElementById('userIdInput').value.trim();
+                if (newUserId) {
+                    userData.userId = newUserId;
+                } else {
+                    alert('角色ID不能为空！');
+                    isValid = false;
+                }
+            } else if (currentEditField === 'password') {
+                const newPassword = document.getElementById('passwordInput').value;
+                const confirmPassword = document.getElementById('passwordConfirm').value;
+                
+                if (newPassword && newPassword === confirmPassword) {
+                    userData.password = newPassword;
+                } else if (newPassword !== confirmPassword) {
+                    alert('两次输入的密码不一致！');
+                    isValid = false;
+                } else {
+                    alert('密码不能为空！');
+                    isValid = false;
+                }
+            }
+            
+            if (isValid) {
+                // 保存到localStorage
+                saveToLocalStorage();
+                
+                // 更新显示
+                loadUserData();
+                
+                // 隐藏编辑表单
+                document.getElementById('editForm').classList.remove('active');
+                
+                // 显示保存成功提示
+                showSaveNotification();
+                
+                // 重置表单
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordConfirm').value = '';
+            }
+        }
+
+        // 取消编辑
+        function cancelEdit() {
+            document.getElementById('editForm').classList.remove('active');
+            // 重置密码输入框
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordConfirm').value = '';
+        }
+
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('userProfile_username', userData.username);
+            localStorage.setItem('userProfile_userId', userData.userId);
+            localStorage.setItem('userProfile_gender', userData.gender);
+            localStorage.setItem('userProfile_password', userData.password);
+            localStorage.setItem('userProfile_experience', userData.experience.toString());
+            localStorage.setItem('userProfile_lessonsCompleted', userData.lessonsCompleted.toString());
+            localStorage.setItem('userProfile_friends', JSON.stringify(userData.friends));
+        }
+
+        // 显示保存成功提示
+        function showSaveNotification() {
+            const notification = document.getElementById('saveNotification');
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 渲染好友列表
+        function renderFriends() {
+            const friendsList = document.getElementById('friendsList');
+            friendsList.innerHTML = '';
+            
+            userData.friends.forEach(friend => {
+                const friendCard = document.createElement('div');
+                friendCard.className = 'friend-card';
+                friendCard.innerHTML = `
+                    <img src="${friend.avatar}" alt="${friend.name}" class="friend-avatar">
+                    <h5>${friend.name}</h5>
+                    <small class="text-muted">在线</small>
+                `;
+                friendsList.appendChild(friendCard);
+            });
+            
+            // 添加添加好友按钮
+            const addFriendCard = document.createElement('div');
+            addFriendCard.className = 'friend-card';
+            addFriendCard.style.cursor = 'pointer';
+            addFriendCard.innerHTML = `
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--light-brown); 
+                     display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
+                    <i class="fas fa-user-plus" style="font-size: 1.5rem; color: white;"></i>
+                </div>
+                <h5 style="color: var(--primary-brown);">添加好友</h5>
+            `;
+            addFriendCard.onclick = addFriend;
+            friendsList.appendChild(addFriendCard);
+        }
+
+        // 添加好友
+        function addFriend() {
+            const friendName = prompt('请输入好友用户名：');
+            if (friendName) {
+                const newFriend = {
+                    name: friendName,
+                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendName}`
+                };
+                userData.friends.push(newFriend);
+                saveToLocalStorage();
+                renderFriends();
+                showSaveNotification();
+            }
+        }
+
+        // 更新经验进度条
+        function updateExperienceBar() {
+            const percentage = (userData.experience / userData.maxExperience) * 100;
+            document.getElementById('experienceBar').style.width = `${percentage}%`;
+        }
+
+        // 更换头像
+        function changeAvatar() {
+            const newSeed = prompt('请输入头像种子（可以是任意文字）:', userData.userId);
+            if (newSeed) {
+                const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${newSeed}`;
+                document.getElementById('avatarImg').src = newAvatarUrl;
+                
+                // 可以保存种子到用户数据
+                userData.userId = newSeed;
+                saveToLocalStorage();
+                showSaveNotification();
+            }
+        }
+
+        // 登出功能
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            if (confirm('确定要登出吗？')) {
+                alert('已登出，正在返回登录页面...');
+                // 这里可以添加跳转到登录页面的代码
+                // window.location.href = 'login.html';
+            }
+        });
+
+        // 模拟增加经验值（测试用）
+        function addExperience(points) {
+            userData.experience = Math.min(userData.experience + points, userData.maxExperience);
+            saveToLocalStorage();
+            loadUserData();
+            updateExperienceBar();
+            
+            // 如果经验值达到上限，升级
+            if (userData.experience >= userData.maxExperience) {
+                alert('恭喜！您的等级提升了！');
+                userData.experience = 0;
+                saveToLocalStorage();
+                loadUserData();
+            }
+        }
+
+        // 模拟完成课程（测试用）
+        function completeLesson() {
+            if (userData.lessonsCompleted < userData.totalLessons) {
+                userData.lessonsCompleted++;
+                userData.experience += 50; // 每完成一节课获得50经验
+                saveToLocalStorage();
+                loadUserData();
+                updateExperienceBar();
+                showSaveNotification();
+            }
+        }
+    </script>
+</body>
+</html>
