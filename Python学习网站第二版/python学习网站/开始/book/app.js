@@ -1,3 +1,41 @@
+// ===== 极简金币系统 =====
+class SimpleCoinSystem {
+    constructor() {
+        this.coinCount = parseInt(localStorage.getItem('userCoins')) || 0;
+        this.updateDisplay();
+    }
+    
+    updateDisplay() {
+    const coinElement = document.getElementById('simpleCoinCount');
+    if (coinElement) {
+        coinElement.textContent = this.coinCount;
+        
+        // 添加获得金币的动画
+        coinElement.classList.remove('coin-gain');
+        void coinElement.offsetWidth; // 触发重绘
+        coinElement.classList.add('coin-gain');
+        
+        // 图标也添加动画
+        const coinIcon = document.querySelector('.coin-icon');
+        if (coinIcon) {
+            coinIcon.classList.remove('coin-gain');
+            void coinIcon.offsetWidth;
+            coinIcon.classList.add('coin-gain');
+        }
+    }
+}
+    
+    addCoins(amount, reason = '') {
+        this.coinCount += amount;
+        localStorage.setItem('userCoins', this.coinCount.toString());
+        this.updateDisplay();
+        console.log(`💰 +${amount}金币 ${reason ? '(' + reason + ')' : ''}`);
+        return this.coinCount;
+    }
+}
+
+// 创建全局实例
+const coinSystem = new SimpleCoinSystem();
 
 let db;
 let currentChapterId = null;
@@ -1618,24 +1656,58 @@ class PracticeSystem {
         return selected === question.answer;
     }
 
-    showFeedback(isCorrect, explanation) {
-        const feedback = document.getElementById('answer-feedback');
+   showFeedback(isCorrect, explanation) {
+    const feedback = document.getElementById('answer-feedback');
+    
+    if (isCorrect) {
+        // 获取当前题目ID
+        const questionId = this.currentQuestions[this.currentQuestionIndex].id;
+        
+        // 检查是否已经答过此题
+        const previouslyCorrect = this.userAnswers[questionId] === true;
+        
         feedback.innerHTML = `
-            <div class="alert ${isCorrect ? 'alert-success' : 'alert-danger'}">
-                <i class="fas ${isCorrect ? 'fa-check' : 'fa-times'}"></i>
-                ${isCorrect ? '回答正确！' : '回答错误！'}
+            <div class="alert alert-success">
+                <i class="fas fa-check"></i>
+                回答正确！
+                ${!previouslyCorrect ? '<span style="color:gold;margin-left:10px;">+5金币！</span>' : ''}
             </div>
         `;
-        feedback.style.display = 'block';
         
-        document.getElementById('show-explanation').style.display = 'inline-block';
-        document.getElementById('submit-answer').disabled = true;
+        // 只有第一次答对此题才给金币
+        if (!previouslyCorrect) {
+            // 确保调用金币系统
+            if (window.coinSystem) {
+                window.coinSystem.addCoins(5, '答对题目');
+            } else if (typeof coinSystem !== 'undefined') {
+                coinSystem.addCoins(5, '答对题目');
+            } else {
+                console.error('金币系统未找到！');
+            }
+        }
         
-        // 禁用所有选项
-        document.querySelectorAll('input[name="answer"]').forEach(input => {
-            input.disabled = true;
-        });
+        // 标记此题已答对
+        this.userAnswers[questionId] = true;
+    } else {
+        feedback.innerHTML = `
+            <div class="alert alert-danger">
+                <i class="fas fa-times"></i>
+                回答错误！
+            </div>
+        `;
+        
+        const questionId = this.currentQuestions[this.currentQuestionIndex].id;
+        this.userAnswers[questionId] = false;
     }
+    
+    feedback.style.display = 'block';
+    document.getElementById('show-explanation').style.display = 'inline-block';
+    document.getElementById('submit-answer').disabled = true;
+    
+    document.querySelectorAll('input[name="answer"]').forEach(input => {
+        input.disabled = true;
+    });
+}
 
     showExplanation() {
         const question = this.currentQuestions[this.currentQuestionIndex];
@@ -1691,46 +1763,54 @@ class PracticeSystem {
     }
 
     calculateScore() {
-        let correctCount = 0;
-        this.currentQuestions.forEach(question => {
-            const userAnswer = this.userAnswers[question.id];
-            if (userAnswer !== undefined && this.checkAnswer(userAnswer, question)) {
-                correctCount++;
-            }
-        });
-        
-        const score = Math.round((correctCount / this.currentQuestions.length) * 100);
-        
-        // 更新章节得分和尝试次数
-        this.chapterScores[this.currentChapter] = score;
-        this.chapterAttempts[this.currentChapter] = (this.chapterAttempts[this.currentChapter] || 0) + 1;
-        this.saveScores();
-        
-        // 显示结果
-        this.showChapterResult(score, correctCount);
-    }
+    let correctCount = 0;
+    this.currentQuestions.forEach(question => {
+        const userAnswer = this.userAnswers[question.id];
+        if (userAnswer !== undefined && this.checkAnswer(userAnswer, question)) {
+            correctCount++;
+        }
+    });
+    
+    const score = Math.round((correctCount / this.currentQuestions.length) * 100);
+    
+    this.chapterScores[this.currentChapter] = score;
+    this.chapterAttempts[this.currentChapter] = (this.chapterAttempts[this.currentChapter] || 0) + 1;
+    this.saveScores();
+    
+    // 把答对题目数传给 showChapterResult
+    this.showChapterResult(score, correctCount);
+}
 
     showChapterResult(score, correctCount) {
-        const totalQuestions = this.currentQuestions.length;
-        const feedback = document.getElementById('answer-feedback');
-        feedback.innerHTML = `
-            <div class="alert ${score >= 60 ? 'alert-success' : 'alert-warning'}">
-                <h5><i class="fas ${score >= 60 ? 'fa-trophy' : 'fa-exclamation-triangle'}"></i> 章节完成！</h5>
-                <p>得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
-                <p>${score >= 60 ? '恭喜！已解锁下一章节！' : '未达到60%，请重新尝试！'}</p>
-                <p>本章剩余尝试次数: ${2 - this.chapterAttempts[this.currentChapter]}</p>
-            </div>
-        `;
-        feedback.style.display = 'block';
-        
-        // 更新界面
-        setTimeout(() => {
-            this.renderChapterGrid();
-            this.updateSidebarStatus();
-            document.getElementById('question-area').style.display = 'none';
-            document.getElementById('chapter-exercises').style.display = 'grid';
-        }, 3000);
+    const totalQuestions = this.currentQuestions.length;
+    const feedback = document.getElementById('answer-feedback');
+    
+    // 章节完成额外奖励：答对题目数 × 3金币
+    const chapterBonus = correctCount * 3;
+    
+    feedback.innerHTML = `
+        <div class="alert ${score >= 60 ? 'alert-success' : 'alert-warning'}">
+            <h5><i class="fas ${score >= 60 ? 'fa-trophy' : 'fa-exclamation-triangle'}"></i> 章节完成！</h5>
+            <p>得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
+            <p>🎉 章节完成奖励：+${chapterBonus}金币！</p>
+            <p>${score >= 60 ? '恭喜！已解锁下一章节！' : '未达到60%，请重新尝试！'}</p>
+            <p>本章剩余尝试次数: ${2 - this.chapterAttempts[this.currentChapter]}</p>
+        </div>
+    `;
+    feedback.style.display = 'block';
+    
+    // 给予章节完成金币奖励
+    if (chapterBonus > 0) {
+        coinSystem.addCoins(chapterBonus, '章节完成奖励');
     }
+    
+    setTimeout(() => {
+        this.renderChapterGrid();
+        this.updateSidebarStatus();
+        document.getElementById('question-area').style.display = 'none';
+        document.getElementById('chapter-exercises').style.display = 'grid';
+    }, 3000);
+}
 }
 
 // 初始化练习系统
