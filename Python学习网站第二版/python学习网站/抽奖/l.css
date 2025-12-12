@@ -1,0 +1,315 @@
+/* 基础样式 */
+:root {
+    --primary-blue: #3498db;
+    --secondary-blue: #2980b9;
+    --gold-color: #FFD700;
+    --silver-color: #C0C0C0;
+    --bronze-color: #CD7F32;
+    --legendary: #FF4500;
+    --epic: #9B30FF;
+    --rare: #007FFF;
+    --common: #808080;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Microsoft YaHei', sans-serif;
+    padding: 20px;
+    color: white;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* 返回按钮 */
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 1.2rem;
+    text-decoration: none;
+    z-index: 1000;
+}
+
+.back-btn:hover {
+    color: var(--gold-color);
+}
+
+/* 金币显示 */
+.coin-display {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 215, 0, 0.9);
+    padding: 10px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+    font-weight: bold;
+    color: #333;
+    z-index: 1000;
+}
+
+.coin-display i {
+    margin-right: 5px;
+}
+
+/* 主容器 */
+.lottery-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 60px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.lottery-container h1 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.lottery-container .subtitle {
+    text-align: center;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* 抽奖主区域 */
+.lottery-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.pet-image-container {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    border: 5px solid white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.pet-image-container img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+}
+
+/* 抽奖按钮 */
+.draw-btn {
+    background: linear-gradient(to right, #4A90E2, #1565C0);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.draw-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.draw-btn:disabled {
+    background: linear-gradient(to right, #ccc, #999);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 结果容器 */
+.result-container {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px auto;
+    max-width: 500px;
+    color: #333;
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.result-container h3 {
+    color: var(--primary-blue);
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.new-pet {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.new-pet img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pet-info {
+    flex: 1;
+}
+
+.new-pet-rarity {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    margin: 5px 0;
+}
+
+.new-pet-rarity.common {
+    background: var(--common);
+}
+
+.new-pet-rarity.rare {
+    background: var(--rare);
+}
+
+.new-pet-rarity.epic {
+    background: var(--epic);
+}
+
+.new-pet-rarity.legendary {
+    background: var(--legendary);
+}
+
+.close-btn {
+    display: block;
+    margin: 0 auto;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.close-btn:hover {
+    background: var(--secondary-blue);
+}
+
+/* 收藏区域 */
+.collection-section {
+    margin-top: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+}
+
+.collection-section h3 {
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.pet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.pet-item {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+    color: #333;
+}
+
+.pet-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.pet-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 10px;
+    border: 2px solid white;
+}
+
+.pet-item h5 {
+    margin: 5px 0;
+    font-size: 1rem;
+}
+
+.pet-rarity-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    color: white;
+}
+
+/* 动画 */
+@keyframes coinGain {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.coin-gain {
+    animation: coinGain 0.5s ease;
+}
+
+@keyframes drawShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.draw-shake {
+    animation: drawShake 0.3s ease-in-out;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .pet-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+    }
+    
+    .pet-image-container {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .new-pet {
+        flex-direction: column;
+        text-align: center;
+    }
+}

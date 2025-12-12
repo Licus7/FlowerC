@@ -6,7 +6,7 @@
     <title>个人档案</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+     <style>
         :root {
             --primary-brown: #A0522D;
             --light-brown: #D2B48C;
@@ -412,7 +412,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+     <div class="container">
         <!-- 返回按钮 -->
         <a href="../../menu.html" class="back-retro">
             <i class="fas fa-arrow-left"></i> 返回菜单
@@ -428,6 +428,27 @@
             </div>
             <h1>角色档案</h1>
         </header>
+
+        <div class="info-item">
+    <span class="info-label">学习等级:</span>
+    <span class="info-value" id="levelDisplay">等级1</span>
+</div>
+
+<div class="info-item">
+    <span class="info-label">章节完成:</span>
+    <span class="info-value" id="lessonDisplay">0/8</span>
+</div>
+
+<div class="info-item">
+    <span class="info-label">总正确率:</span>
+    <span class="info-value" id="accuracyDisplay">0%</span>
+</div>
+
+<!--可以在底部添加重置按钮-->
+<button id="resetProgressBtn" class="btn btn-warning mt-3"
+        style="background:#ffc107;color:#000;">
+    <i class="fas fa-redo"></i>重置答题进度
+</button>
 
         <!-- 个人信息显示区 -->
         <div class="profile-card">
@@ -548,307 +569,366 @@
         <i class="fas fa-check-circle"></i> 保存成功！
     </div>
 
-    <script>
-        // 用户数据
-        let userData = {
-            username: localStorage.getItem('userProfile_username') || '111',
-            userId: localStorage.getItem('userProfile_userId') || 'ID_001',
-            gender: localStorage.getItem('userProfile_gender') || 'male',
-            password: localStorage.getItem('userProfile_password') || '123456',
-            experience: parseInt(localStorage.getItem('userProfile_experience')) || 350,
-            maxExperience: 1000,
-            lessonsCompleted: parseInt(localStorage.getItem('userProfile_lessonsCompleted')) || 25,
-            totalLessons: 100,
-            friends: JSON.parse(localStorage.getItem('userProfile_friends')) || [
-                { name: '李四', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=李四' },
-                { name: '王五', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=王五' },
-                { name: '赵六', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=赵六' },
-                { name: '小红', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=小红' }
-            ]
+   <script>
+    // 用户数据
+    let userData = {
+        username: localStorage.getItem('userProfile_username') || '111',
+        userId: localStorage.getItem('userProfile_userId') || 'ID_001',
+        gender: localStorage.getItem('userProfile_gender') || 'male',
+        password: localStorage.getItem('userProfile_password') || '123456',
+        experience: parseInt(localStorage.getItem('userProfile_experience')) || 350,
+        maxExperience: 1000,
+        lessonsCompleted: parseInt(localStorage.getItem('userProfile_lessonsCompleted')) || 25,
+        totalLessons: 100,
+        friends: JSON.parse(localStorage.getItem('userProfile_friends')) || [
+            { name: '李四', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=李四' },
+            { name: '王五', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=王五' },
+            { name: '赵六', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=赵六' },
+            { name: '小红', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=小红' }
+        ]
+    };
+
+    // 当前编辑的字段
+    let currentEditField = '';
+    let progressMgr = null;
+
+    // 页面加载时初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        loadUserData();
+        renderFriends();
+        updateExperienceBar();
+        initProgressManager();
+    });
+
+    // 初始化进度管理器
+    function initProgressManager() {
+        // 动态加载progressManager.js
+        const script = document.createElement('script');
+        script.src = 'progressManager.js';
+        script.onload = function() {
+            progressMgr = new ProgressManager();
+            syncProgressData();
         };
+        document.head.appendChild(script);
+    }
 
-        // 当前编辑的字段
-        let currentEditField = '';
+    // 同步答题进度数据
+    function syncProgressData() {
+        if (!progressMgr) return;
+        
+        const stats = progressMgr.getStatsForDisplay();
+        
+        // 更新经验值
+        userData.experience = progressMgr.calculateTotalExperience();
+        
+        // 更新完成课程数（转换为百分比）
+        userData.lessonsCompleted = Math.min(
+            Math.round((stats.completedChapters / stats.totalChapters) * 100),
+            100
+        );
+        
+        // 更新显示
+        document.getElementById('lessonDisplay').textContent = 
+            `${userData.lessonsCompleted}/100`;
+        
+        // 添加正确率显示
+        const accuracyDisplay = document.getElementById('accuracyDisplay');
+        if (!accuracyDisplay) {
+            // 如果还没有正确率显示区域，创建一个
+            const infoItem = document.createElement('div');
+            infoItem.className = 'info-item';
+            infoItem.innerHTML = `
+                <span class="info-label">正确率:</span>
+                <span class="info-value" id="accuracyDisplay">${stats.accuracy}%</span>
+            `;
+            document.querySelector('.profile-card').appendChild(infoItem);
+        } else {
+            accuracyDisplay.textContent = `${stats.accuracy}%`;
+        }
+        
+        updateExperienceBar();
+    }
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            loadUserData();
-            renderFriends();
-            updateExperienceBar();
+    // 加载用户数据显示
+    function loadUserData() {
+        document.getElementById('usernameDisplay').textContent = userData.username;
+        document.getElementById('userIdDisplay').textContent = userData.userId;
+        
+        let genderText = '';
+        switch(userData.gender) {
+            case 'male': genderText = '男性'; break;
+            case 'female': genderText = '女性'; break;
+            default: genderText = '其他'; break;
+        }
+        document.getElementById('genderDisplay').textContent = genderText;
+        
+        // 更新课程完成度显示
+        document.getElementById('lessonDisplay').textContent = 
+            `${userData.lessonsCompleted}/100`;
+    }
+
+    // 渲染朋友列表
+    function renderFriends() {
+        const friendsList = document.getElementById('friendsList');
+        friendsList.innerHTML = '';
+        
+        userData.friends.forEach(friend => {
+            const friendCard = `
+                <div class="friend-card">
+                    <img src="${friend.avatar}" alt="${friend.name}" class="friend-avatar">
+                    <div style="font-weight:600;color:#333">${friend.name}</div>
+                    <div style="font-size:.9rem;color:#666">在线</div>
+                </div>`;
+            friendsList.innerHTML += friendCard;
         });
+    }
 
-        // 加载用户数据到页面
-        function loadUserData() {
-            // 设置显示值
-            document.getElementById('usernameDisplay').textContent = userData.username;
-            document.getElementById('userIdDisplay').textContent = userData.userId;
-            document.getElementById('genderDisplay').textContent = getGenderText(userData.gender);
-            document.getElementById('lessonDisplay').textContent = `${userData.lessonsCompleted}/${userData.totalLessons}`;
-            document.getElementById('experienceText').textContent = `${userData.experience}/${userData.maxExperience} XP`;
-            
-            // 更新头像
-            document.getElementById('avatarImg').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${userData.userId}`;
-            
-            // 更新进度条
-            const percentage = (userData.experience / userData.maxExperience) * 100;
-            document.getElementById('experienceBar').style.width = `${percentage}%`;
-        }
+    // 更新经验条
+    function updateExperienceBar() {
+        const experienceBar = document.getElementById('experienceBar');
+        const experienceText = document.getElementById('experienceText');
+        
+        if (!experienceBar || !experienceText) return;
+        
+        // 计算当前等级（每500经验升一级）
+        const level = Math.floor(userData.experience / 500) + 1;
+        
+        // 当前等级所需经验范围
+        const currentLevelMinXP = (level - 1) * 500;
+        const currentLevelMaxXP = level * 500;
+        
+        // 计算当前等级内的进度百分比
+        const currentLevelProgress = userData.experience - currentLevelMinXP;
+        const currentLevelTotal = 500; // 每级需要500经验
+        const percentage = Math.min((currentLevelProgress / currentLevelTotal) * 100, 100);
+        
+        experienceBar.style.width = `${percentage}%`;
+        experienceText.textContent = 
+            `Lv.${level} ${userData.experience}/${currentLevelMaxXP} XP`;
+    }
 
-        // 获取性别文本
-        function getGenderText(gender) {
-            const genderMap = {
-                'male': '男性',
-                'female': '女性',
-                'other': '其他'
-            };
-            return genderMap[gender] || '未设置';
-        }
-
-        // 编辑字段
-        function editField(field) {
-            currentEditField = field;
-            
-            // 隐藏所有编辑区域
-            document.querySelectorAll('#editForm .form-group').forEach(el => {
-                el.style.display = 'none';
-            });
-            
-            // 显示当前编辑区域
-            document.getElementById(`${field}Edit`).style.display = 'block';
-            
-            // 设置表单标题
-            const titles = {
-                'username': '编辑用户名',
-                'userId': '编辑角色ID',
-                'gender': '选择性别',
-                'password': '修改密码'
-            };
-            document.getElementById('editTitle').textContent = titles[field] || '编辑信息';
-            
-            // 预填当前值
-            if (field === 'username') {
+    // 编辑字段
+    function editField(field) {
+        currentEditField = field;
+        
+        // 隐藏所有编辑表单
+        document.getElementById('usernameEdit').style.display = 'none';
+        document.getElementById('userIdEdit').style.display = 'none';
+        document.getElementById('genderEdit').style.display = 'none';
+        document.getElementById('passwordEdit').style.display = 'none';
+        
+        // 设置标题和显示对应的编辑表单
+        const editForm = document.getElementById('editForm');
+        editForm.classList.add('active');
+        
+        // 重置性别选择
+        document.querySelectorAll('.gender-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        switch(field) {
+            case 'username':
+                document.getElementById('editTitle').textContent = '编辑用户名';
+                document.getElementById('usernameEdit').style.display = 'block';
                 document.getElementById('usernameInput').value = userData.username;
-            } else if (field === 'userId') {
+                break;
+                
+            case 'userId':
+                document.getElementById('editTitle').textContent = '编辑角色ID';
+                document.getElementById('userIdEdit').style.display = 'block';
                 document.getElementById('userIdInput').value = userData.userId;
-            } else if (field === 'gender') {
+                break;
+                
+            case 'gender':
+                document.getElementById('editTitle').textContent = '选择性别';
+                document.getElementById('genderEdit').style.display = 'block';
+                
                 // 选中当前性别
-                document.querySelectorAll('.gender-option').forEach(el => {
-                    el.classList.remove('selected');
-                });
-                // 根据当前性别选中对应选项
-                const genderOption = document.querySelector(`[onclick="selectGender('${userData.gender}')"]`);
+                const genderOption = document.querySelector(`.gender-option[onclick*="${userData.gender}"]`);
                 if (genderOption) {
                     genderOption.classList.add('selected');
                 }
-            }
-            
-            // 显示编辑表单
-            document.getElementById('editForm').classList.add('active');
-            
-            // 滚动到编辑区域
-            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+                break;
+                
+            case 'password':
+                document.getElementById('editTitle').textContent = '修改密码';
+                document.getElementById('passwordEdit').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordConfirm').value = '';
+                break;
         }
+    }
 
-        // 选择性别
-        function selectGender(gender) {
-            // 移除所有选中状态
-            document.querySelectorAll('.gender-option').forEach(el => {
-                el.classList.remove('selected');
-            });
-            
-            // 添加选中状态到点击的元素
-            const clickedElement = event.target.closest('.gender-option');
-            clickedElement.classList.add('selected');
-            
-            // 更新数据
-            userData.gender = gender;
+    // 选择性别
+    function selectGender(gender) {
+        // 移除所有选中状态
+        document.querySelectorAll('.gender-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // 添加当前选中状态
+        const selectedOption = document.querySelector(`.gender-option[onclick*="${gender}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
         }
+        
+        // 预览显示
+        let genderText = '';
+        switch(gender) {
+            case 'male': genderText = '男性'; break;
+            case 'female': genderText = '女性'; break;
+            default: genderText = '其他'; break;
+        }
+        document.getElementById('genderDisplay').textContent = genderText;
+    }
 
-        // 保存更改
-        function saveChanges() {
-            let isValid = true;
-            
-            if (currentEditField === 'username') {
+    // 保存更改
+    function saveChanges() {
+        switch(currentEditField) {
+            case 'username':
                 const newUsername = document.getElementById('usernameInput').value.trim();
                 if (newUsername) {
                     userData.username = newUsername;
-                } else {
-                    alert('用户名不能为空！');
-                    isValid = false;
+                    localStorage.setItem('userProfile_username', newUsername);
+                    document.getElementById('usernameDisplay').textContent = newUsername;
                 }
-            } else if (currentEditField === 'userId') {
+                break;
+                
+            case 'userId':
                 const newUserId = document.getElementById('userIdInput').value.trim();
                 if (newUserId) {
                     userData.userId = newUserId;
-                } else {
-                    alert('角色ID不能为空！');
-                    isValid = false;
+                    localStorage.setItem('userProfile_userId', newUserId);
+                    document.getElementById('userIdDisplay').textContent = newUserId;
                 }
-            } else if (currentEditField === 'password') {
+                break;
+                
+            case 'gender':
+                const selectedGender = document.querySelector('.gender-option.selected');
+                if (selectedGender) {
+                    const onclickAttr = selectedGender.getAttribute('onclick');
+                    const genderMatch = onclickAttr.match(/'([^']+)'/);
+                    if (genderMatch) {
+                        userData.gender = genderMatch[1];
+                        localStorage.setItem('userProfile_gender', genderMatch[1]);
+                    }
+                }
+                break;
+                
+            case 'password':
                 const newPassword = document.getElementById('passwordInput').value;
                 const confirmPassword = document.getElementById('passwordConfirm').value;
                 
-                if (newPassword && newPassword === confirmPassword) {
-                    userData.password = newPassword;
-                } else if (newPassword !== confirmPassword) {
-                    alert('两次输入的密码不一致！');
-                    isValid = false;
-                } else {
-                    alert('密码不能为空！');
-                    isValid = false;
+                if (!newPassword) {
+                    alert('请输入新密码！');
+                    return;
                 }
-            }
-            
-            if (isValid) {
-                // 保存到localStorage
-                saveToLocalStorage();
                 
-                // 更新显示
-                loadUserData();
+                if (newPassword !== confirmPassword) {
+                    alert('两次输入的密码不一致！');
+                    return;
+                }
                 
-                // 隐藏编辑表单
-                document.getElementById('editForm').classList.remove('active');
+                if (newPassword.length < 6) {
+                    alert('密码长度不能少于6位！');
+                    return;
+                }
                 
-                // 显示保存成功提示
-                showSaveNotification();
-                
-                // 重置表单
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordConfirm').value = '';
-            }
+                userData.password = newPassword;
+                localStorage.setItem('userProfile_password', newPassword);
+                alert('密码修改成功！');
+                break;
         }
-
-        // 取消编辑
-        function cancelEdit() {
-            document.getElementById('editForm').classList.remove('active');
-            // 重置密码输入框
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('passwordConfirm').value = '';
-        }
-
-        // 保存到本地存储
-        function saveToLocalStorage() {
-            localStorage.setItem('userProfile_username', userData.username);
-            localStorage.setItem('userProfile_userId', userData.userId);
-            localStorage.setItem('userProfile_gender', userData.gender);
-            localStorage.setItem('userProfile_password', userData.password);
-            localStorage.setItem('userProfile_experience', userData.experience.toString());
-            localStorage.setItem('userProfile_lessonsCompleted', userData.lessonsCompleted.toString());
-            localStorage.setItem('userProfile_friends', JSON.stringify(userData.friends));
-        }
-
+        
+        // 隐藏编辑表单
+        cancelEdit();
+        
         // 显示保存成功提示
-        function showSaveNotification() {
-            const notification = document.getElementById('saveNotification');
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+        showNotification();
+    }
 
-        // 渲染好友列表
-        function renderFriends() {
-            const friendsList = document.getElementById('friendsList');
-            friendsList.innerHTML = '';
-            
-            userData.friends.forEach(friend => {
-                const friendCard = document.createElement('div');
-                friendCard.className = 'friend-card';
-                friendCard.innerHTML = `
-                    <img src="${friend.avatar}" alt="${friend.name}" class="friend-avatar">
-                    <h5>${friend.name}</h5>
-                    <small class="text-muted">在线</small>
-                `;
-                friendsList.appendChild(friendCard);
-            });
-            
-            // 添加添加好友按钮
-            const addFriendCard = document.createElement('div');
-            addFriendCard.className = 'friend-card';
-            addFriendCard.style.cursor = 'pointer';
-            addFriendCard.innerHTML = `
-                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--light-brown); 
-                     display: flex; align-items: center; justify-content: center; margin: 0 auto 10px;">
-                    <i class="fas fa-user-plus" style="font-size: 1.5rem; color: white;"></i>
-                </div>
-                <h5 style="color: var(--primary-brown);">添加好友</h5>
-            `;
-            addFriendCard.onclick = addFriend;
-            friendsList.appendChild(addFriendCard);
-        }
+    // 取消编辑
+    function cancelEdit() {
+        document.getElementById('editForm').classList.remove('active');
+        currentEditField = '';
+        // 恢复显示当前值
+        loadUserData();
+    }
 
-        // 添加好友
-        function addFriend() {
-            const friendName = prompt('请输入好友用户名：');
-            if (friendName) {
-                const newFriend = {
-                    name: friendName,
-                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${friendName}`
-                };
-                userData.friends.push(newFriend);
-                saveToLocalStorage();
-                renderFriends();
-                showSaveNotification();
+    // 更换头像
+    function changeAvatar() {
+        const avatarSeed = prompt('请输入头像种子（英文或数字）:', '用户');
+        if (avatarSeed) {
+            const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(avatarSeed)}`;
+            document.getElementById('avatarImg').src = avatarUrl;
+            // 可以保存到localStorage
+            localStorage.setItem('userProfile_avatar', avatarUrl);
+            showNotification();
+        }
+    }
+
+    // 显示通知
+    function showNotification() {
+        const notification = document.getElementById('saveNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 2000);
+    }
+
+    // 登出功能
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        if (confirm('确定要登出账户吗？')) {
+            // 清除登录状态，但不删除用户数据
+            sessionStorage.removeItem('isLoggedIn');
+            alert('已登出！');
+            // 跳转到登录页或首页
+            window.location.href = '../../login.html';
+        }
+    });
+
+    // 监听答题系统的事件（如果需要从答题app接收数据）
+    window.addEventListener('quizResultUpdated', function(event) {
+        if (progressMgr && event.detail) {
+            // 更新特定章节的进度
+            if (event.detail.chapterId && event.detail.correctCount) {
+                progressMgr.updateChapterProgress(
+                    event.detail.chapterId,
+                    event.detail.correctCount
+                );
+                syncProgressData();
             }
         }
+    });
 
-        // 更新经验进度条
-        function updateExperienceBar() {
-            const percentage = (userData.experience / userData.maxExperience) * 100;
-            document.getElementById('experienceBar').style.width = `${percentage}%`;
-        }
-
-        // 更换头像
-        function changeAvatar() {
-            const newSeed = prompt('请输入头像种子（可以是任意文字）:', userData.userId);
-            if (newSeed) {
-                const newAvatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${newSeed}`;
-                document.getElementById('avatarImg').src = newAvatarUrl;
-                
-                // 可以保存种子到用户数据
-                userData.userId = newSeed;
-                saveToLocalStorage();
-                showSaveNotification();
-            }
-        }
-
-        // 登出功能
-        document.getElementById('logoutButton').addEventListener('click', function() {
-            if (confirm('确定要登出吗？')) {
-                alert('已登出，正在返回登录页面...');
-                // 这里可以添加跳转到登录页面的代码
-                // window.location.href = 'login.html';
-            }
-        });
-
-        // 模拟增加经验值（测试用）
-        function addExperience(points) {
-            userData.experience = Math.min(userData.experience + points, userData.maxExperience);
-            saveToLocalStorage();
-            loadUserData();
-            updateExperienceBar();
-            
-            // 如果经验值达到上限，升级
-            if (userData.experience >= userData.maxExperience) {
-                alert('恭喜！您的等级提升了！');
-                userData.experience = 0;
-                saveToLocalStorage();
-                loadUserData();
-            }
-        }
-
-        // 模拟完成课程（测试用）
-        function completeLesson() {
-            if (userData.lessonsCompleted < userData.totalLessons) {
-                userData.lessonsCompleted++;
-                userData.experience += 50; // 每完成一节课获得50经验
-                saveToLocalStorage();
+    // 添加重置进度按钮（可选功能）
+    function addResetButton() {
+        const profileCard = document.querySelector('.profile-card');
+        const resetButton = document.createElement('button');
+        resetButton.className = 'btn btn-outline-danger w-100 mt-3';
+        resetButton.innerHTML = '<i class="fas fa-trash"></i> 重置答题进度';
+        resetButton.onclick = function() {
+            if (confirm('警告：这将清除所有答题记录和经验值！确定继续吗？')) {
+                localStorage.removeItem('quizProgress_v3');
+                localStorage.setItem('userProfile_experience', '350');
+                localStorage.setItem('userProfile_lessonsCompleted', '0');
+                if (progressMgr) {
+                    progressMgr.initProgressData();
+                }
+                userData.experience = 350;
+                userData.lessonsCompleted = 0;
                 loadUserData();
                 updateExperienceBar();
-                showSaveNotification();
+                alert('进度已重置！');
             }
-        }
-    </script>
+        };
+        profileCard.appendChild(resetButton);
+    }
+
+    // 页面加载完成后添加重置按钮
+    setTimeout(() => {
+        addResetButton();
+    }, 1000);
+</script>
 </body>
 </html>

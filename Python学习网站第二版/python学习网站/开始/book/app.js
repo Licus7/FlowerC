@@ -1267,3 +1267,188 @@ if (window.location.pathname.includes('practice.html')) {
         window.practiceSystem = new PracticeSystem();
     }, 500);
 }
+
+class ProgressManager {
+    constructor() {
+        this.progressData = JSON.parse(localStorage.getItem('quizProgress')) || this.initProgressData();
+    }
+
+    initProgressData() {
+        const data = {};
+        for (let chapterId in practiceQuestions) {
+            data[chapterId] = {
+                totalQuestions: practiceQuestions[chapterId].length,
+                answeredCorrectly:
+                    parseInt(localStorage.getItem(`chapter_${chapterId}_correct`)) ||0,
+                lastScore:
+                    parseInt(localStorage.getItem(`chapter_${chapterId}_score`)) ||0,
+                isCompleted:
+                    localStorage.getItem(`chapter_${chapterId}_completed`) ==='true'|| false,
+                completionDate:
+                    localStorage.getItem(`chapter_${chapterId}_date`) || null
+           };
+       }
+       return data ;
+   }
+
+   updateChapterProgress(chapterId, correctAnswers,totalQuestions){
+       const chapterData=this.progressData[chapterId];
+       if(!chapterData)return;
+
+       chapterData.answeredCorrectly=correctAnswers ;
+       chapterData.lastScore=Math.round((correctAnswers/totalQuestions)*100);
+       chapterData.isCompleted=correctAnswers===totalQuestions ;
+
+       if(chapterData.isCompleted){
+          chapterData.completionDate=new Date().toISOString().split('T');
+          localStorage.setItem(`chapter_${chapterId}_date`,chapterData.completionDate);
+
+          //奖励经验值
+          this.addExperience(50+chapterData.lastScore);
+      }
+
+      localStorage.setItem(`chapter_${chapterId}_correct`,correctAnswers.toString());
+      localStorage.setItem(`chapter_${chapterId}_score`,chapterData.lastScore.toString());
+      localStorage.setItem(`chapter_${chapterId}_completed`,chapterData.isCompleted.toString());
+      localStorage.setItem('quizProgress',JSON.stringify(this.progressData));
+
+      this.updateOverallProgress();
+      return chapterData.lastScore ;
+   }
+
+   addExperience(points){
+       userData.experience+=points ;
+       localStorage.setItem('userProfile_experience',userData.experience.toString());
+       updateExperienceBar();
+   }
+
+   updateOverallProgress(){
+       let totalCorrect=0,totalQuestions=0,totalChapters=Object.keys(practiceQuestions).length ;
+
+       for(let chapterId in this.progressData){
+          const chapter=this.progressData[chapterId];
+          totalCorrect+=chapter.answeredCorrectly ;
+          totalQuestions+=chapter.totalQuestions ;
+       }
+
+       //更新用户数据中的课程完成数（假设每个章节相当于一个课程）
+       const completedChapters=
+           Object.values(this.progressData).filter(ch=>ch.isCompleted).length;
+
+       userData.lessonsCompleted=completedChapters*Math.floor(userData.totalLessons/totalChapters)||completedChapters;
+
+       localStorage.setItem('userProfile_lessonsCompleted',userData.lessonsCompleted.toString());
+   }
+
+   getOverallStats(){
+      return{
+          totalChapters:
+              Object.keys(practiceQuestions).length,
+          completedChapters:
+              Object.values(this.progressData).filter(ch=>ch.isCompleted).length,
+          overallAccuracy:
+              this.getOverallAccuracy(),
+          totalExperience:
+              userData.experience
+      };
+   }
+
+   getOverallAccuracy(){
+      let totalCorrect=0,totalQuestions=0;
+
+      for(let chapterId in this.progressData){
+          const chapter=this.progressData[chapterId];
+          totalCorrect+=chapter.answeredCorrectly ;
+          totalQuestions+=chapter.totalQuestions ;
+      }
+
+      return totalQuestions>0 ? Math.round((totalCorrect/totalQuestions)*100) :0 ;
+   }
+
+   resetProgress(){
+       if(confirm('确定要重置所有答题进度吗？此操作不可撤销！')){
+           localStorage.removeItem('quizProgress');
+
+           for(let chapterId in practiceQuestions){
+               localStorage.removeItem(`chapter_${chapterId}_correct`);
+               localStorage.removeItem(`chapter_${chapterId}_score`);
+               localStorage.removeItem(`chapter_${chapterId}_completed`);
+               localStorage.removeItem(`chapter_${chapterId}_date`);
+           }
+
+           this.progressData=this.initProgressData();
+           alert('答题进度已重置！');
+           location.reload();
+      }
+   }
+}
+
+// ==== profile.html原有的功能（补充完整）====
+
+//更新经验进度条（修改原函数）
+function updateExperienceBar(){
+   const experienceBar=
+       document.getElementById('experienceBar');
+   const experienceText=
+       document.getElementById('experienceText');
+
+   if(experienceBar && experienceText){
+      const percentage=
+          (userData.experience/userData.maxExperience)*100;
+
+      experienceBar.style.width=`${Math.min(percentage,100)}%`;
+
+      experienceText.textContent=
+         `${userData.experience}/${userData.maxExperience} XP`;
+
+      //等级计算（可选）
+      const level=
+          Math.floor(userData.experience/200)+1;
+
+      //在页面其他地方显示等级（需要添加HTML元素）
+      const levelDisplay=
+          document.getElementById('levelDisplay');
+
+      if(levelDisplay){
+          levelDisplay.textContent=`等级 ${level}`;
+     }
+ }
+
+ updateLessonDisplay();
+}
+
+//更新课程显示
+function updateLessonDisplay(){
+   const lessonDisplay=
+       document.getElementById('lessonDisplay');
+
+   if(lessonDisplay){
+      const progressManager=new ProgressManager();
+      const stats=progressManager.getOverallStats();
+
+      lessonDisplay.textContent=`${stats.completedChapters}/${stats.totalChapters}章`;
+
+      //可以添加更多信息
+      document.getElementById('accuracyDisplay').textContent=
+         `正确率 ${stats.overallAccuracy}%`;
+   }
+}
+
+//在DOMContentLoaded中添加：
+document.addEventListener('DOMContentLoaded',function(){
+   loadUserData();
+   renderFriends();
+   updateExperienceBar(); //更新经验条
+
+   //初始化进度管理器并显示统计数据
+   const progressManager=new ProgressManager();
+   progressManager.updateOverallProgress();
+
+   //添加重置按钮事件监听（需要在HTML中添加按钮）
+   const resetBtn=
+       document.getElementById('resetProgressBtn');
+
+   if(resetBtn){
+       resetBtn.addEventListener('click',()=>progressManager.resetProgress());
+   }
+});
