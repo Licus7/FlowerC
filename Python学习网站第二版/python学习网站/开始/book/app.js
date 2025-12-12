@@ -791,27 +791,56 @@ class PracticeSystem {
     }
 
     init() {
-    console.log('=== 练习系统初始化 ===');
-    console.log('金币系统:', window.coinSystem ? '✅ 找到' : '❌ 未找到');
-    console.log('当前金币:', localStorage.getItem('userCoins'));
-    
-    // 额外：立即检查金币显示
-    setTimeout(() => {
-        const coinElement = document.getElementById('simpleCoinCount');
-        if (coinElement) {
-            const saved = localStorage.getItem('userCoins');
-            const coins = saved ? parseInt(saved) : 0;
-            if (coinElement.textContent === '0' && coins > 0) {
-                console.log('🔄 app.js检测到显示错误，正在修复...');
-                coinElement.textContent = coins;
+        console.log('=== 练习系统初始化 ===');
+        console.log('金币系统:', window.coinSystem ? '✅ 找到' : '❌ 未找到');
+        console.log('当前金币:', localStorage.getItem('userCoins'));
+        
+        // 确保页面元素存在
+        this.ensurePageElements();
+        
+        // 初始化UI
+        this.renderChapterGrid();
+        this.bindEvents();
+        this.updateSidebarStatus();
+        
+        // 额外：立即检查金币显示
+        setTimeout(() => {
+            const coinElement = document.getElementById('simpleCoinCount');
+            if (coinElement) {
+                const saved = localStorage.getItem('userCoins');
+                const coins = saved ? parseInt(saved) : 0;
+                if (coinElement.textContent === '0' && coins > 0) {
+                    console.log('🔄 app.js检测到显示错误，正在修复...');
+                    coinElement.textContent = coins;
+                }
             }
-        }
-    }, 1000);
+        }, 1000);
+    }
     
-    this.renderChapterGrid();
-    this.bindEvents();
-    this.updateSidebarStatus();
-}
+    // 确保页面元素存在
+    ensurePageElements() {
+        // 检查必要的DOM元素
+        const elements = [
+            'chapter-exercises',
+            'question-area',
+            'practice-title',
+            'question-title',
+            'question-type',
+            'question-chapter',
+            'answer-area',
+            'answer-feedback',
+            'prev-question',
+            'next-question',
+            'submit-answer',
+            'show-explanation'
+        ];
+        
+        elements.forEach(id => {
+            if (!document.getElementById(id)) {
+                console.warn(`⚠️ 元素 #${id} 不存在，可能HTML结构有问题`);
+            }
+        });
+    }
 
     getStoredScores() {
         return JSON.parse(localStorage.getItem('chapterScores')) || {};
@@ -1101,58 +1130,58 @@ class PracticeSystem {
     }
 
     // ✅ 新增：安全的金币添加方法
-   addCoinsSafely(amount, reason) {
-    console.log(`尝试添加金币: ${amount}, 原因: ${reason}`);
-    
-    // 方法1：使用 window.addCoins
-    if (typeof window.addCoins === 'function') {
-        try {
-            console.log('✅ 通过window.addCoins添加');
-            const result = window.addCoins(amount, reason);
-            console.log(`✅ 金币添加成功，总数: ${result}`);
-            return true;
-        } catch (error) {
-            console.warn('方法失败:', error);
-        }
-    }
-    
-    // 方法2：直接操作
-    console.log('使用直接操作方法');
-    try {
-        // 读取
-        let current = 0;
-        const saved = localStorage.getItem('userCoins');
-        if (saved !== null) {
-            const num = parseInt(saved);
-            if (!isNaN(num)) current = num;
-        }
+    addCoinsSafely(amount, reason) {
+        console.log(`尝试添加金币: ${amount}, 原因: ${reason}`);
         
-        // 计算
-        const newTotal = current + amount;
-        
-        // 保存
-        localStorage.setItem('userCoins', newTotal.toString());
-        
-        // 更新显示
-        const coinElement = document.getElementById('simpleCoinCount');
-        if (coinElement) {
-            coinElement.textContent = newTotal;
-            
-            // 动画
-            if (amount > 0) {
-                coinElement.classList.remove('coin-gain');
-                void coinElement.offsetWidth;
-                coinElement.classList.add('coin-gain');
+        // 方法1：使用 window.addCoins
+        if (typeof window.addCoins === 'function') {
+            try {
+                console.log('✅ 通过window.addCoins添加');
+                const result = window.addCoins(amount, reason);
+                console.log(`✅ 金币添加成功，总数: ${result}`);
+                return true;
+            } catch (error) {
+                console.warn('方法失败:', error);
             }
         }
         
-        console.log(`✅ 金币更新: ${current} → ${newTotal}`);
-        return true;
-    } catch (error) {
-        console.error('添加金币失败:', error);
-        return false;
+        // 方法2：直接操作
+        console.log('使用直接操作方法');
+        try {
+            // 读取
+            let current = 0;
+            const saved = localStorage.getItem('userCoins');
+            if (saved !== null) {
+                const num = parseInt(saved);
+                if (!isNaN(num)) current = num;
+            }
+            
+            // 计算
+            const newTotal = current + amount;
+            
+            // 保存
+            localStorage.setItem('userCoins', newTotal.toString());
+            
+            // 更新显示
+            const coinElement = document.getElementById('simpleCoinCount');
+            if (coinElement) {
+                coinElement.textContent = newTotal;
+                
+                // 动画
+                if (amount > 0) {
+                    coinElement.classList.remove('coin-gain');
+                    void coinElement.offsetWidth;
+                    coinElement.classList.add('coin-gain');
+                }
+            }
+            
+            console.log(`✅ 金币更新: ${current} → ${newTotal}`);
+            return true;
+        } catch (error) {
+            console.error('添加金币失败:', error);
+            return false;
+        }
     }
-}
 
     showExplanation() {
         const question = this.currentQuestions[this.currentQuestionIndex];
@@ -1210,6 +1239,7 @@ class PracticeSystem {
         }
     }
 
+    // ✅ 修改：在原calculateScore函数中添加进度同步
     calculateScore() {
         let correctCount = 0;
         this.currentQuestions.forEach(question => {
@@ -1225,7 +1255,60 @@ class PracticeSystem {
         this.chapterAttempts[this.currentChapter] = (this.chapterAttempts[this.currentChapter] || 0) + 1;
         this.saveScores();
         
+        // ✅ 新增：同步到进度管理器（非破坏性添加）
+        this.syncProgressToManager(score, correctCount);
+        
         this.showChapterResult(score, correctCount);
+    }
+    
+    // ✅ 新增：同步到进度管理器
+    syncProgressToManager(score, correctCount) {
+        console.log(`同步章节 ${this.currentChapter} 进度: ${score}% (${correctCount}/${this.currentQuestions.length})`);
+        
+        // 方法1：使用全局进度管理器
+        if (window.progressManager && typeof window.progressManager.updateChapterProgress === 'function') {
+            window.progressManager.updateChapterProgress(
+                this.currentChapter,
+                score,
+                correctCount,
+                this.currentQuestions.length
+            );
+            console.log('✅ 已同步到全局进度管理器');
+        } 
+        // 方法2：直接保存到新格式
+        else {
+            this.saveToNewProgressFormat(score, correctCount);
+        }
+    }
+    
+    // ✅ 新增：保存到新进度格式
+    saveToNewProgressFormat(score, correctCount) {
+        try {
+            // 读取现有进度
+            const existing = JSON.parse(localStorage.getItem('userProgress_v3')) || {
+                chapters: {},
+                bossDefeated: false,
+                lastUpdated: null
+            };
+            
+            // 更新当前章节
+            existing.chapters[this.currentChapter] = {
+                completed: score >= 60,
+                score: score,
+                accuracy: Math.round((correctCount / this.currentQuestions.length) * 100),
+                questionsAnswered: correctCount,
+                totalQuestions: this.currentQuestions.length,
+                lastUpdated: new Date().toISOString()
+            };
+            
+            existing.lastUpdated = new Date().toISOString();
+            
+            // 保存
+            localStorage.setItem('userProgress_v3', JSON.stringify(existing));
+            console.log('✅ 已保存到 userProgress_v3 格式');
+        } catch (e) {
+            console.warn('保存到新格式失败:', e);
+        }
     }
 
     showChapterResult(score, correctCount) {
@@ -1245,7 +1328,7 @@ class PracticeSystem {
         `;
         feedback.style.display = 'block';
         
-        // ✅ 修复：章节完成也给金币
+        // ✅ 章节完成也给金币
         if (chapterBonus > 0) {
             this.addCoinsSafely(chapterBonus, '章节完成奖励');
         }
@@ -1259,196 +1342,47 @@ class PracticeSystem {
     }
 }
 
-// 初始化练习系统
-if (window.location.pathname.includes('practice.html')) {
-    // 延迟初始化，确保金币系统先加载
+// 初始化练习系统（只在练习页面）
+if (window.location.pathname.includes('practice.html') || 
+    window.location.pathname.includes('book/')) {
+    // 延迟初始化，确保页面元素加载完成
     setTimeout(() => {
         console.log('初始化练习系统...');
-        window.practiceSystem = new PracticeSystem();
+        
+        // 检查页面元素是否存在
+        if (document.getElementById('chapter-exercises') || 
+            document.getElementById('practice-title')) {
+            window.practiceSystem = new PracticeSystem();
+            console.log('✅ 练习系统初始化成功');
+        } else {
+            console.error('❌ 练习页面元素不存在，检查HTML结构');
+            
+            // 尝试重新初始化（可能DOM还没加载完）
+            setTimeout(() => {
+                if (document.getElementById('chapter-exercises')) {
+                    window.practiceSystem = new PracticeSystem();
+                    console.log('✅ 延迟初始化成功');
+                }
+            }, 500);
+        }
     }, 500);
 }
 
-class ProgressManager {
-    constructor() {
-        this.progressData = JSON.parse(localStorage.getItem('quizProgress')) || this.initProgressData();
+// ✅ 可选：添加进度管理器加载（非必须，因为profile.html已加载）
+function loadProgressManagerIfNeeded() {
+    if (typeof ProgressManager === 'undefined') {
+        console.log('尝试加载进度管理器...');
+        const script = document.createElement('script');
+        script.src = '../progressManager.js'; // 根据实际路径调整
+        script.onload = () => console.log('进度管理器加载完成');
+        script.onerror = () => console.warn('进度管理器加载失败');
+        document.head.appendChild(script);
     }
-
-    initProgressData() {
-        const data = {};
-        for (let chapterId in practiceQuestions) {
-            data[chapterId] = {
-                totalQuestions: practiceQuestions[chapterId].length,
-                answeredCorrectly:
-                    parseInt(localStorage.getItem(`chapter_${chapterId}_correct`)) ||0,
-                lastScore:
-                    parseInt(localStorage.getItem(`chapter_${chapterId}_score`)) ||0,
-                isCompleted:
-                    localStorage.getItem(`chapter_${chapterId}_completed`) ==='true'|| false,
-                completionDate:
-                    localStorage.getItem(`chapter_${chapterId}_date`) || null
-           };
-       }
-       return data ;
-   }
-
-   updateChapterProgress(chapterId, correctAnswers,totalQuestions){
-       const chapterData=this.progressData[chapterId];
-       if(!chapterData)return;
-
-       chapterData.answeredCorrectly=correctAnswers ;
-       chapterData.lastScore=Math.round((correctAnswers/totalQuestions)*100);
-       chapterData.isCompleted=correctAnswers===totalQuestions ;
-
-       if(chapterData.isCompleted){
-          chapterData.completionDate=new Date().toISOString().split('T');
-          localStorage.setItem(`chapter_${chapterId}_date`,chapterData.completionDate);
-
-          //奖励经验值
-          this.addExperience(50+chapterData.lastScore);
-      }
-
-      localStorage.setItem(`chapter_${chapterId}_correct`,correctAnswers.toString());
-      localStorage.setItem(`chapter_${chapterId}_score`,chapterData.lastScore.toString());
-      localStorage.setItem(`chapter_${chapterId}_completed`,chapterData.isCompleted.toString());
-      localStorage.setItem('quizProgress',JSON.stringify(this.progressData));
-
-      this.updateOverallProgress();
-      return chapterData.lastScore ;
-   }
-
-   addExperience(points){
-       userData.experience+=points ;
-       localStorage.setItem('userProfile_experience',userData.experience.toString());
-       updateExperienceBar();
-   }
-
-   updateOverallProgress(){
-       let totalCorrect=0,totalQuestions=0,totalChapters=Object.keys(practiceQuestions).length ;
-
-       for(let chapterId in this.progressData){
-          const chapter=this.progressData[chapterId];
-          totalCorrect+=chapter.answeredCorrectly ;
-          totalQuestions+=chapter.totalQuestions ;
-       }
-
-       //更新用户数据中的课程完成数（假设每个章节相当于一个课程）
-       const completedChapters=
-           Object.values(this.progressData).filter(ch=>ch.isCompleted).length;
-
-       userData.lessonsCompleted=completedChapters*Math.floor(userData.totalLessons/totalChapters)||completedChapters;
-
-       localStorage.setItem('userProfile_lessonsCompleted',userData.lessonsCompleted.toString());
-   }
-
-   getOverallStats(){
-      return{
-          totalChapters:
-              Object.keys(practiceQuestions).length,
-          completedChapters:
-              Object.values(this.progressData).filter(ch=>ch.isCompleted).length,
-          overallAccuracy:
-              this.getOverallAccuracy(),
-          totalExperience:
-              userData.experience
-      };
-   }
-
-   getOverallAccuracy(){
-      let totalCorrect=0,totalQuestions=0;
-
-      for(let chapterId in this.progressData){
-          const chapter=this.progressData[chapterId];
-          totalCorrect+=chapter.answeredCorrectly ;
-          totalQuestions+=chapter.totalQuestions ;
-      }
-
-      return totalQuestions>0 ? Math.round((totalCorrect/totalQuestions)*100) :0 ;
-   }
-
-   resetProgress(){
-       if(confirm('确定要重置所有答题进度吗？此操作不可撤销！')){
-           localStorage.removeItem('quizProgress');
-
-           for(let chapterId in practiceQuestions){
-               localStorage.removeItem(`chapter_${chapterId}_correct`);
-               localStorage.removeItem(`chapter_${chapterId}_score`);
-               localStorage.removeItem(`chapter_${chapterId}_completed`);
-               localStorage.removeItem(`chapter_${chapterId}_date`);
-           }
-
-           this.progressData=this.initProgressData();
-           alert('答题进度已重置！');
-           location.reload();
-      }
-   }
 }
 
-// ==== profile.html原有的功能（补充完整）====
-
-//更新经验进度条（修改原函数）
-function updateExperienceBar(){
-   const experienceBar=
-       document.getElementById('experienceBar');
-   const experienceText=
-       document.getElementById('experienceText');
-
-   if(experienceBar && experienceText){
-      const percentage=
-          (userData.experience/userData.maxExperience)*100;
-
-      experienceBar.style.width=`${Math.min(percentage,100)}%`;
-
-      experienceText.textContent=
-         `${userData.experience}/${userData.maxExperience} XP`;
-
-      //等级计算（可选）
-      const level=
-          Math.floor(userData.experience/200)+1;
-
-      //在页面其他地方显示等级（需要添加HTML元素）
-      const levelDisplay=
-          document.getElementById('levelDisplay');
-
-      if(levelDisplay){
-          levelDisplay.textContent=`等级 ${level}`;
-     }
- }
-
- updateLessonDisplay();
+// 页面加载完成后尝试加载
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadProgressManagerIfNeeded);
+} else {
+    loadProgressManagerIfNeeded();
 }
-
-//更新课程显示
-function updateLessonDisplay(){
-   const lessonDisplay=
-       document.getElementById('lessonDisplay');
-
-   if(lessonDisplay){
-      const progressManager=new ProgressManager();
-      const stats=progressManager.getOverallStats();
-
-      lessonDisplay.textContent=`${stats.completedChapters}/${stats.totalChapters}章`;
-
-      //可以添加更多信息
-      document.getElementById('accuracyDisplay').textContent=
-         `正确率 ${stats.overallAccuracy}%`;
-   }
-}
-
-//在DOMContentLoaded中添加：
-document.addEventListener('DOMContentLoaded',function(){
-   loadUserData();
-   renderFriends();
-   updateExperienceBar(); //更新经验条
-
-   //初始化进度管理器并显示统计数据
-   const progressManager=new ProgressManager();
-   progressManager.updateOverallProgress();
-
-   //添加重置按钮事件监听（需要在HTML中添加按钮）
-   const resetBtn=
-       document.getElementById('resetProgressBtn');
-
-   if(resetBtn){
-       resetBtn.addEventListener('click',()=>progressManager.resetProgress());
-   }
-});

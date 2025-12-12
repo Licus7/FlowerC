@@ -750,17 +750,105 @@ playerHitFlash() {
     }
 
     // 检查胜利条件
-    checkVictory() {
-        if (this.bossHealth <= 0) {
-            setTimeout(() => {
-                const victoryScreen = document.getElementById('victoryScreen');
-                if (victoryScreen) {
-                    victoryScreen.style.display = 'flex';
-                    this.lazyLoadVictoryVideo();
-                }
-            }, 1000);
+// 修改 checkVictory() 函数：
+checkVictory() {
+    if (this.bossHealth <= 0) {
+        setTimeout(() => {
+            const victoryScreen = document.getElementById('victoryScreen');
+            if (victoryScreen) {
+                victoryScreen.style.display = 'flex';
+                this.lazyLoadVictoryVideo();
+                
+                // ✅ 新增：标记Boss已战胜
+                this.markBossVictoryInProgress();
+            }
+        }, 1000);
+    }
+}
+
+// 新增：标记Boss战胜
+markBossVictoryInProgress() {
+    // 方法1：使用进度管理器
+    if (window.progressManager) {
+        window.progressManager.markBossDefeated();
+    }
+    
+    // 方法2：直接存储到localStorage
+    const progress = JSON.parse(localStorage.getItem('userProgress_v2')) || {
+        chapters: {},
+        bossDefeated: false
+    };
+    progress.bossDefeated = true;
+    progress.bossDefeatDate = new Date().toISOString();
+    localStorage.setItem('userProgress_v2', JSON.stringify(progress));
+    
+    // 方法3：发送消息通知其他页面
+    window.postMessage({
+        type: 'bossVictory',
+        data: { victory: true, timestamp: new Date().toISOString() }
+    }, '*');
+    
+    // 发送给父窗口（如果是从其他页面打开的）
+    if (window.opener) {
+        window.opener.postMessage({
+            type: 'bossVictory',
+            data: { victory: true }
+        }, '*');
+    }
+    
+    console.log('🎉 Boss战胜状态已保存！');
+}
+
+// 新增：在BossBattle类的init方法中检查Boss状态
+init() {
+    console.log('初始化BossBattle...');
+    
+    // ✅ 新增：加载进度管理器
+    this.loadProgressManager();
+    
+    this.bindEvents();
+    this.createRainEffect();
+    this.setBossBackground();
+    this.setupAudio();
+    this.initPlayerHearts();
+}
+
+// ✅ 新增：加载进度管理器的方法
+loadProgressManager() {
+    if (typeof ProgressManager !== 'undefined') {
+        console.log('✅ ProgressManager 已加载');
+        return;
+    }
+    
+    // boss.js 和 progressManager.js 在同一目录，直接引用
+    const script = document.createElement('script');
+    script.src = 'progressManager.js';  // 同目录
+    
+    script.onload = () => {
+        console.log('✅ Boss界面：进度管理器加载成功');
+        if (typeof ProgressManager === 'function') {
+            window.progressManager = new ProgressManager();
+        }
+    };
+    
+    script.onerror = () => {
+        console.warn('❌ Boss界面：进度管理器加载失败');
+    };
+    
+    document.head.appendChild(script);
+}
+// 新增：检查现有Boss状态
+checkExistingBossStatus() {
+    const progress = JSON.parse(localStorage.getItem('userProgress_v2'));
+    if (progress && progress.bossDefeated) {
+        console.log('⚠️ 玩家已战胜过Boss');
+        // 可以在这里添加一些视觉提示
+        const title = document.querySelector('h1');
+        if (title) {
+            title.innerHTML += ' <span style="color:gold;font-size:0.8em;">(已通关)</span>';
         }
     }
+}
 
     // 终极稳定的视频加载方案
     lazyLoadVictoryVideo() {
