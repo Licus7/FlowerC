@@ -47,9 +47,27 @@
             pointer-events: none;
         }
 
-       .tutorial-box {
-    color: #f8f9fabf !important; /* 灰白色 */
-}
+        /* 屏幕变暗效果 - 新增 */
+        .screen-darken {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity 1s ease;
+            pointer-events: none;
+        }
+        
+        .screen-darken.active {
+            opacity: 1;
+        }
+
+        .tutorial-box {
+            color: #f8f9fabf !important;
+        }
         
         /* 玩法说明框 */
         .tutorial-box {
@@ -134,7 +152,60 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
+            z-index: 3 !important;
+        }
+        
+        /* =========== Boss呼吸动画 =========== */
+        @keyframes bossBreathing {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bossRage {
+            0% { filter: brightness(1) hue-rotate(0deg); }
+            50% { filter: brightness(1.3) hue-rotate(-10deg); }
+            100% { filter: brightness(1) hue-rotate(0deg); }
+        }
+        
+        .boss-background.boss-breathing {
+            animation: bossBreathing 5s ease-in-out infinite;
+        }
+        
+        .boss-background.boss-raging {
+            animation: bossRage 0.8s ease-in-out;
+        }
+        
+        /* =========== Boss震怒效果 =========== */
+        @keyframes bossRageEffect {
+            0% { 
+                filter: brightness(1.2) hue-rotate(0deg);
+                transform: scale(1);
+            }
+            20% { 
+                filter: brightness(1.8) hue-rotate(-20deg);
+                transform: scale(1.05);
+            }
+            40% { 
+                filter: brightness(2) hue-rotate(20deg);
+                transform: scale(0.98);
+            }
+            60% { 
+                filter: brightness(1.8) hue-rotate(-15deg);
+                transform: scale(1.03);
+            }
+            80% { 
+                filter: brightness(1.4) hue-rotate(10deg);
+                transform: scale(0.99);
+            }
+            100% { 
+                filter: brightness(1.2) hue-rotate(0deg);
+                transform: scale(1);
+            }
+        }
+        
+        .boss-background.rage-effect {
+            animation: bossRageEffect 0.8s ease-in-out;
         }
         
         .background-overlay {
@@ -155,7 +226,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 3;
+            z-index: 4;
         }
         
         .rain-drop {
@@ -171,103 +242,149 @@
             100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
         }
 
+        /* =========== 闪电特效 =========== */
+        .lightning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+        }
+        
+        .lightning.active {
+            animation: lightningFlash 0.3s;
+        }
+        
+        @keyframes lightningFlash {
+            0% { opacity: 0; background: transparent; }
+            10% { opacity: 1; background: rgba(255, 255, 255, 0.7); }
+            20% { opacity: 0.3; background: rgba(255, 255, 255, 0.3); }
+            30% { opacity: 1; background: rgba(255, 255, 255, 0.5); }
+            100% { opacity: 0; background: transparent; }
+        }
+        
+        /* =========== 鲤鱼王GIF效果 =========== */
+        .magikarp-gif {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            opacity: 0.7;
+            filter: brightness(0.9) contrast(1.2) drop-shadow(0 0 5px rgba(0, 100, 200, 0.6));
+            transform-origin: center;
+        }
+
+        /* 定义湖区域（屏幕中间30%-70%高度的区域） */
+        .lake-area {
+            position: fixed;
+            top: 30%;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
         /* 技能容器 - 半透明 */
-   /* 调整技能容器 - 更窄但更高 */
-.skills-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 70%; /* 从85%缩小到70% */
-    max-width: 450px; /* 从500px缩小到450px */
-    z-index: 400;
-    background: transparent;
-    border: 3px solid #000;
-    padding: 12px 10px; /* 上下内边距增加，左右缩小 */
-    box-shadow: 0 0 15px rgba(0,0,0,0.5);
-}
+        .skills-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            max-width: 450px;
+            z-index: 400;
+            background: transparent;
+            border: 3px solid #000;
+            padding: 12px 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
 
-.skill-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px; /* 间距稍微增加 */
-}
+        .skill-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
 
-.skill-btn {
-    padding: 14px 6px; /* 上下内边距增加，保持左右不变 */
-    border: 2px solid;
-    font-weight: bold;
-    color: rgb(249, 245, 245);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-shadow: 1px 1px 0 #080000;
-    font-size: 11px;
-    font-family: 'Courier New', monospace;
-    background: #333;
-    position: relative;
-    box-shadow: 
-        inset 0 0 0 1px rgba(255,255,255,0.1),
-        0 2px 0 rgba(0,0,0,0.8);
-    border-radius: 0;
-    text-align: center;
-    min-height: 50px; /* 最小高度增加 */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    line-height: 1.2; /* 行高稍微增加 */
-}
+        .skill-btn {
+            padding: 14px 6px;
+            border: 2px solid;
+            font-weight: bold;
+            color: rgb(249, 245, 245);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 0 #080000;
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+            background: #333;
+            position: relative;
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.1),
+                0 2px 0 rgba(0,0,0,0.8);
+            border-radius: 0;
+            text-align: center;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.2;
+        }
 
-.skill-btn small {
-    font-size: 9px;
-    margin-top: 2px; /* 上边距稍微增加 */
-}
+        .skill-btn small {
+            font-size: 9px;
+            margin-top: 2px;
+        }
 
-.skill-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 
-        inset 0 0 0 1px rgba(255,255,255,0.3),
-        0 4px 0 rgba(0,0,0,0.8);
-}
+        .skill-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.3),
+                0 4px 0 rgba(0,0,0,0.8);
+        }
 
-.skill-btn:active {
-    transform: translateY(1px);
-    box-shadow: 
-        inset 0 0 0 1px rgba(0,0,0,0.5),
-        0 1px 0 rgba(0,0,0,0.8);
-}
+        .skill-btn:active {
+            transform: translateY(1px);
+            box-shadow: 
+                inset 0 0 0 1px rgba(0,0,0,0.5),
+                0 1px 0 rgba(0,0,0,0.8);
+        }
 
-.skill-btn::before {
-    content: '';
-    position: absolute;
-    top: 1px;
-    left: 1px;
-    right: 1px;
-    bottom: 1px;
-    border: 1px solid rgba(255,255,255,0.2);
-    pointer-events: none;
-}
+        .skill-btn::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border: 1px solid rgba(255,255,255,0.2);
+            pointer-events: none;
+        }
 
-/* 技能颜色保持不变 */
-.skill-1 { 
-    background: #e2c909;
-    border-color: #ca9e0d;
-}
+        /* 技能颜色保持不变 */
+        .skill-1 { 
+            background: #e2c909;
+            border-color: #ca9e0d;
+        }
 
-.skill-2 { 
-    background: #a25104;
-    border-color: #b26c04;
-}
+        .skill-2 { 
+            background: #a25104;
+            border-color: #b26c04;
+        }
 
-.skill-3 { 
-    background: #edc40b;
-    border-color: #c2970b;
-}
+        .skill-3 { 
+            background: #edc40b;
+            border-color: #c2970b;
+        }
 
-.skill-4 { 
-    background: #a8a996;
-    border-color: #86867f;
-}
+        .skill-4 { 
+            background: #a8a996;
+            border-color: #86867f;
+        }
 
         /* 捷拉奥拉图片容器 */
         .hero-pokemon {
@@ -302,26 +419,25 @@
             font-size: 16px;
         }
 
-        /* 控制面板放在右下角 */
         /* 控制面板 - 统一样式 */
-.control-panel {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 400;
-    background: rgba(51, 51, 51, 0.9); /* 统一深灰色背景 */
-    border: 3px solid #000; /* 统一黑色边框 */
-    padding: 10px;
-    box-shadow: 
-        0 0 0 2px #080808,
-        inset 0 0 0 1px rgba(255,255,255,0.1),
-        0 2px 0 rgba(0,0,0,0.8); /* 统一阴影效果 */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 200px;
-    backdrop-filter: blur(5px);
-}
+        .control-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 400;
+            background: rgba(51, 51, 51, 0.9);
+            border: 3px solid #000;
+            padding: 10px;
+            box-shadow: 
+                0 0 0 2px #080808,
+                inset 0 0 0 1px rgba(255,255,255,0.1),
+                0 2px 0 rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 200px;
+            backdrop-filter: blur(5px);
+        }
 
         .control-btn {
             padding: 12px 8px;
@@ -356,61 +472,60 @@
             background: #700404;
         }
 
-        /* 菜单弹窗 */
         /* 菜单弹窗 - 统一技能按钮风格 */
-.menu-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #202020; /* 统一深灰色背景 */
-    padding: 20px;
-    border: 3px solid #000; /* 统一黑色边框 */
-    z-index: 2000;
-    display: none;
-    box-shadow: 
-        0 0 0 2px #fff,
-        inset 0 0 0 1px rgba(255,255,255,0.1),
-        0 4px 0 rgba(0,0,0,0.8); /* 统一阴影效果 */
-    font-family: 'Courier New', monospace;
-    text-align: center;
-}
+        .menu-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #202020;
+            padding: 20px;
+            border: 3px solid #000;
+            z-index: 2000;
+            display: none;
+            box-shadow: 
+                0 0 0 2px #fff,
+                inset 0 0 0 1px rgba(255,255,255,0.1),
+                0 4px 0 rgba(0,0,0,0.8);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
 
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
-}
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
 
-.menu-btn {
-    padding: 12px;
-    border: 2px solid #000;
-    background: #7f8c8d;
-    color: white;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s;
-    text-shadow: 1px 1px 0 #000;
-    box-shadow: 
-        inset 0 0 0 1px rgba(255,255,255,0.1),
-        0 2px 0 rgba(0,0,0,0.8);
-}
+        .menu-btn {
+            padding: 12px;
+            border: 2px solid #000;
+            background: #7f8c8d;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-shadow: 1px 1px 0 #000;
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.1),
+                0 2px 0 rgba(0,0,0,0.8);
+        }
 
-.menu-btn:hover {
-    background: #95a5a6;
-    transform: translateY(-1px);
-    box-shadow: 
-        inset 0 0 0 1px rgba(255,255,255,0.3),
-        0 3px 0 rgba(0,0,0,0.8);
-}
+        .menu-btn:hover {
+            background: #95a5a6;
+            transform: translateY(-1px);
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.3),
+                0 3px 0 rgba(0,0,0,0.8);
+        }
 
-.menu-btn:active {
-    transform: translateY(1px);
-    box-shadow: 
-        inset 0 0 0 1px rgba(0,0,0,0.5),
-        0 1px 0 rgba(0,0,0,0.8);
-}
+        .menu-btn:active {
+            transform: translateY(1px);
+            box-shadow: 
+                inset 0 0 0 1px rgba(0,0,0,0.5),
+                0 1px 0 rgba(0,0,0,0.8);
+        }
 
         .continue-btn {
             background: #057534;
@@ -603,174 +718,324 @@
         }
 
         /* 本地视频样式 */
-.victory-video {
-    width: 800px;
-    height: 450px;
-    max-width: 90vw;
-    max-height: 50vh;
-    border: 3px solid #ffd700;
-    border-radius: 10px;
-    background: #000;
-    display: none; /* 初始隐藏 */
-}
+        .victory-video {
+            width: 800px;
+            height: 450px;
+            max-width: 90vw;
+            max-height: 50vh;
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            background: #000;
+            display: none;
+        }
 
-.loading-message {
-    color: #ffd700;
-    font-size: 18px;
-    text-align: center;
-    padding: 30px;
-    background: rgba(0, 0, 0, 0.8);
-    border-radius: 10px;
-}
+        .loading-message {
+            color: #ffd700;
+            font-size: 18px;
+            text-align: center;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+        }
 
-.video-controls {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-}
+        .video-controls {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
         /* 捷拉奥拉攻击动画 */
-/* 修复后的攻击动画 */
-.hero-attack {
-    position: fixed;
-    top: 50%;
-    left: 0;
-    z-index: 1200;
-    display: none;
-}
+        .hero-attack {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            z-index: 1200;
+            display: none;
+        }
 
-.attack-image {
-    width: 200px;
-    height: 200px;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
+        .attack-image {
+            width: 200px;
+            height: 200px;
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        /* 攻击移动动画 */
+        .attack-moving {
+            animation: attackMove 1.5s ease-in-out forwards;
+        }
+
+        /* 全宽度横条展开动画 */
+        @keyframes fullWidthExpand {
+            0% {
+                clip-path: inset(0 50% 0 50%);
+                opacity: 0;
+                filter: brightness(0.3);
+            }
+            30% {
+                clip-path: inset(0 30% 0 30%);
+                opacity: 0.8;
+                filter: brightness(1.5);
+            }
+            60% {
+                clip-path: inset(0 10% 0 10%);
+                opacity: 1;
+                filter: brightness(1.8);
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
+                opacity: 1;
+                filter: brightness(1.2);
+            }
+        }
+
+        /* 横条电击效果 */
+        @keyframes electricBar {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 40px rgba(255, 215, 0, 0.5),
+                    inset 0 8px 30px rgba(255, 215, 0, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 80px rgba(255, 255, 0, 0.8),
+                    inset 0 8px 50px rgba(255, 255, 0, 0.6);
+            }
+        }
+
+        /* 玩家血条样式 */
+        .player-health {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 500;
+            text-align: left;
+            background: rgba(32, 32, 32, 0.9);
+            padding: 8px 12px;
+            border: 3px solid #000;
+            box-shadow: 
+                0 0 0 2px #070707,
+                inset 0 0 0 1px rgba(255,255,255,0.1),
+                0 2px 0 rgba(0,0,0,0.8);
+            font-family: 'Courier New', monospace;
+        }
+
+        .health-text {
+            color: white;
+            font-size: 11px;
+            margin-bottom: 6px;
+            text-shadow: 1px 1px 0 #000;
+            font-weight: bold;
+        }
+
+        .hearts-container {
+            display: flex;
+            gap: 6px;
+        }
+
+        /* 使用爱心图片 */
+        .heart {
+            width: 20px;
+            height: 20px;
+            background: url('../背景+音频/爱心.jpg') center/contain no-repeat;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 1px #000);
+        }
+
+        .heart.lost {
+            filter: brightness(0.4) grayscale(1);
+        }
+
+        /* 心形扣血动画 */
+        @keyframes heartBreak {
+            0% { transform: scale(1); opacity: 1; }
+            25% { transform: scale(1.3); opacity: 0.8; }
+            50% { transform: scale(0.7); opacity: 0.5; }
+            75% { transform: scale(1.1); opacity: 0.3; }
+            100% { transform: scale(1); opacity: 0.2; }
+        }
+
+        .heart.damaged {
+            animation: heartBreak 0.6s ease-in-out forwards;
+        }
+
+        /* 简单屏幕闪红效果 */
+        .screen-red-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.3);
+            z-index: 999;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .screen-red-overlay.active {
+            opacity: 1;
+            animation: redFlash 0.8s ease-in-out;
+        }
+
+        @keyframes redFlash {
+            0% { opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { opacity: 0; }
+        }
+
+        /* =========== 血量预警效果 =========== */
+        @keyframes healthWarning {
+            0% { box-shadow: 0 0 10px rgba(255,0,0,0.8); }
+            50% { box-shadow: 0 0 25px rgba(255,50,50,1); }
+            100% { box-shadow: 0 0 10px rgba(255,0,0,0.8); }
+        }
+
+        .boss-health.low-health .boss-health-bar {
+            animation: healthWarning 1s infinite;
+        }
+
+        .boss-health.critical-health .boss-health-bar {
+            animation: healthWarning 0.5s infinite;
+        }
+
+        /* =========== 危险提示 =========== */
+        .danger-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0000;
+            font-size: 36px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff0000, 0 0 40px #ff0000;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+
+        .danger-alert.show {
+            animation: dangerPulse 0.5s ease-in-out;
+        }
+
+        @keyframes dangerPulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* =========== Boss呼吸动画 - 三个阶段 =========== */
+        @keyframes bossBreathing {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.02); filter: brightness(1.05); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+
+        @keyframes ragingBreathing {
+            0% { transform: scale(1); filter: brightness(1.1) hue-rotate(0deg); }
+            25% { transform: scale(1.03) translateX(-2px); filter: brightness(1.2) hue-rotate(-5deg); }
+            50% { transform: scale(1.05); filter: brightness(1.3) hue-rotate(0deg); }
+            75% { transform: scale(1.03) translateX(2px); filter: brightness(1.2) hue-rotate(5deg); }
+            100% { transform: scale(1); filter: brightness(1.1) hue-rotate(0deg); }
+        }
+
+        @keyframes furiousBreathing {
+            0% { transform: scale(1); filter: brightness(1.2) hue-rotate(0deg) saturate(1.5); }
+            20% { transform: scale(1.04) translateX(-3px); filter: brightness(1.5) hue-rotate(-10deg) saturate(2); }
+            40% { transform: scale(1.08); filter: brightness(1.8) hue-rotate(0deg) saturate(2.5); }
+            60% { transform: scale(1.06) translateY(-3px); filter: brightness(1.7) hue-rotate(10deg) saturate(2.2); }
+            80% { transform: scale(1.02) translateX(3px); filter: brightness(1.4) hue-rotate(-5deg) saturate(1.8); }
+            100% { transform: scale(1); filter: brightness(1.2) hue-rotate(0deg) saturate(1.5); }
+        }
+
+        .boss-background.boss-breathing {
+            animation: bossBreathing 4s ease-in-out infinite;
+        }
+
+        .boss-background.raging-breathing {
+            animation: ragingBreathing 3s ease-in-out infinite;
+        }
+
+        .boss-background.furious-breathing {
+            animation: furiousBreathing 2s ease-in-out infinite;
+        }
+
+        /* Boss震怒效果（受击时） */
+        @keyframes bossRageHit {
+            0% { filter: brightness(1.5) hue-rotate(0deg); }
+            20% { filter: brightness(2) hue-rotate(-20deg); }
+            40% { filter: brightness(2.5) hue-rotate(20deg); }
+            60% { filter: brightness(2) hue-rotate(-15deg); }
+            80% { filter: brightness(1.7) hue-rotate(10deg); }
+            100% { filter: brightness(1.5) hue-rotate(0deg); }
+        }
+
+        .boss-background.boss-raging {
+            animation: bossRageHit 0.8s ease-in-out;
+        }
+
+        /* =========== 阶段标题动画 =========== */
+        @keyframes phaseTitleAnimation {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+                text-shadow: 0 0 0px #ff0000;
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+                text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000;
+            }
+            40% {
+                transform: translate(-50%, -50%) scale(1);
+                text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000;
+            }
+            60% {
+                transform: translate(-50%, -50%) scale(1.1);
+                text-shadow: 0 0 50px #ff0000, 0 0 100px #ff0000;
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+                text-shadow: 0 0 30px #ff0000, 0 0 60px #ff0000;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+                text-shadow: 0 0 10px #ff0000;
+            }
+        }
+
+        /* 红色闪电特效 */
+        @keyframes redLightning {
+            0% { opacity: 0; background: transparent; }
+            10% { opacity: 1; background: rgba(255, 50, 50, 0.9); }
+            20% { opacity: 0.3; background: rgba(255, 100, 100, 0.3); }
+            30% { opacity: 1; background: rgba(255, 80, 80, 0.6); }
+            100% { opacity: 0; background: transparent; }
+        }
+
+        /* 橙色闪电特效 */
+        @keyframes orangeLightning {
+            0% { opacity: 0; background: transparent; }
+            10% { opacity: 1; background: rgba(255, 150, 50, 0.8); }
+            20% { opacity: 0.3; background: rgba(255, 180, 80, 0.3); }
+            30% { opacity: 1; background: rgba(255, 165, 65, 0.5); }
+            100% { opacity: 0; background: transparent; }
+        }
+
+        .battle-scene {
     position: relative;
-}
-
-/* 攻击移动动画 */
-.attack-moving {
-    animation: attackMove 1.5s ease-in-out forwards;
-}
-
-/* 全宽度横条展开动画 */
-@keyframes fullWidthExpand {
-    0% {
-        clip-path: inset(0 50% 0 50%); /* 从中间一条线开始 */
-        opacity: 0;
-        filter: brightness(0.3);
-    }
-    30% {
-        clip-path: inset(0 30% 0 30%);
-        opacity: 0.8;
-        filter: brightness(1.5);
-    }
-    60% {
-        clip-path: inset(0 10% 0 10%);
-        opacity: 1;
-        filter: brightness(1.8);
-    }
-    100% {
-        clip-path: inset(0 0 0 0); /* 完全展开到全屏宽度 */
-        opacity: 1;
-        filter: brightness(1.2);
-    }
-}
-
-/* 横条电击效果 */
-@keyframes electricBar {
-    0%, 100% { 
-        box-shadow: 
-            0 0 40px rgba(255, 215, 0, 0.5),
-            inset 0 8px 30px rgba(255, 215, 0, 0.3);
-    }
-    50% { 
-        box-shadow: 
-            0 0 80px rgba(255, 255, 0, 0.8),
-            inset 0 8px 50px rgba(255, 255, 0, 0.6);
-    }
-}
-
-/* 极简玩家血条样式 - 左上角 */
-/* 玩家血条样式 - 统一技能按钮风格 */
-.player-health {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 500;
-    text-align: left;
-    background: rgba(32, 32, 32, 0.9); /* 统一深灰色背景 */
-    padding: 8px 12px;
-    border: 3px solid #000; /* 统一黑色边框 */
-    box-shadow: 
-        0 0 0 2px #070707,
-        inset 0 0 0 1px rgba(255,255,255,0.1),
-        0 2px 0 rgba(0,0,0,0.8); /* 统一阴影效果 */
-    font-family: 'Courier New', monospace;
-}
-
-.health-text {
-    color: white;
-    font-size: 11px;
-    margin-bottom: 6px;
-    text-shadow: 1px 1px 0 #000;
-    font-weight: bold;
-}
-
-.hearts-container {
-    display: flex;
-    gap: 6px;
-}
-
-/* 使用爱心图片 */
-/* 使用爱心图片 - 无白框放大版 */
-.heart {
-    width: 20px;  /* 放大尺寸 */
-    height: 20px; /* 放大尺寸 */
-    background: url('../背景+音频/爱心.jpg') center/contain no-repeat;
-    image-rendering: pixelated;
-    filter: drop-shadow(0 0 1px #000);
-}
-
-.heart.lost {
-    filter: brightness(0.4) grayscale(1);
-}
-
-/* 心形扣血动画 */
-@keyframes heartBreak {
-    0% { transform: scale(1); opacity: 1; }
-    25% { transform: scale(1.3); opacity: 0.8; }
-    50% { transform: scale(0.7); opacity: 0.5; }
-    75% { transform: scale(1.1); opacity: 0.3; }
-    100% { transform: scale(1); opacity: 0.2; }
-}
-
-.heart.damaged {
-    animation: heartBreak 0.6s ease-in-out forwards;
-}
-
-/* 简单屏幕闪红效果 */
-.screen-red-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 0, 0, 0.3);
-    z-index: 999;
-    pointer-events: none;
-    opacity: 0;
-}
-
-.screen-red-overlay.active {
-    opacity: 1;
-    animation: redFlash 0.8s ease-in-out;
-}
-
-@keyframes redFlash {
-    0% { opacity: 0; }
-    50% { opacity: 0.4; }
-    100% { opacity: 0; }
+    min-height: 100vh;
+    display: none;
+    overflow: hidden;
+    /* 新增：整体变暗效果 */
+    filter: brightness(0.7) contrast(1.1);
+    transition: filter 1s ease;
 }
 
     </style>
@@ -786,18 +1051,29 @@
     <audio id="battleRainSound" loop>
         <source src="../背景+音频/雷雨.mp3" type="audio/mpeg">
     </audio>
+    <!-- 新增：闪电音效 -->
+    <audio id="thunderSound">
+        <source src="../背景+音频/雷电.mp3" type="audio/mpeg">
+    </audio>
 
-    <!-- 黑色遮罩层 -->
+    <!-- 特效层 -->
     <div class="screen-overlay" id="screenOverlay"></div>
     <div class="white-flash" id="whiteFlash"></div>
     <div class="slow-flash" id="slowFlash"></div>
-    <!-- 在现有的遮罩层后面添加 -->
-<div class="screen-red-overlay" id="screenRedOverlay"></div>
+    <!-- 新增：屏幕变暗效果 -->
+    <div class="screen-darken" id="screenDarken"></div>
+    <!-- 闪电特效 -->
+    <div class="lightning" id="lightningEffect"></div>
+    <!-- 危险提示 -->
+    <div class="danger-alert" id="dangerAlert">危险！</div>
+    
+    <!-- 玩家受击闪红 -->
+    <div class="screen-red-overlay" id="screenRedOverlay"></div>
     
     <!-- 玩法说明界面 -->
     <div class="boss-container" id="tutorialScreen">
         <div class="tutorial-box">
-            <h2>Boss--“愤怒之湖”--暴鲤龙</h2>
+            <h2>Boss--"愤怒之湖"--暴鲤龙</h2>
             <div class="boss-health-bar mt-4">
                 <div class="health-fill" style="width: 100%;"></div>
             </div>
@@ -806,7 +1082,7 @@
             <div class="mt-4 text-start">
                 <p class="list-unstyled"><strong>你整天百无聊赖，厌倦了城市的生活，在没有你目的地的冒险的途中，你路过了一个小镇，
                     小镇的北端是一个大湖，居民们靠捕鱼为生，但最近几年关于湖中那个庞然大物的恶讯频频流传..
-                    那红色的怪物无差别攻击靠近湖泊的人们，从此湖泊便被称为“愤怒之湖”，你打算去帮助居民解决灾难...</strong></p>
+                    那红色的怪物无差别攻击靠近湖泊的人们，从此湖泊便被称为"愤怒之湖"，你打算去帮助居民解决灾难...</strong></p>
                 <h5>规则：</h5>
                 <ul class="list-unstyled">
                     <li> <strong># 不同的技能对应不同难度的题目和威力，选择技能后需要进行答题测试</strong> </li>
@@ -846,7 +1122,7 @@
         <div class="player-health">
             <div class="health-text">玩家生命值</div>
             <div class="hearts-container" id="playerHearts">
-        <!-- 5颗心会通过JS动态生成 -->
+                <!-- 5颗心会通过JS动态生成 -->
             </div>
         </div>
         
@@ -937,42 +1213,45 @@
         </button>
     </div>
 
+    <!-- 湖区域 -->
+    <div class="lake-area" id="lakeArea"></div>
+    
     <!-- 失败界面 -->
-<div class="victory-screen" id="defeatScreen">
-    <div class="victory-message">💪 再接再厉！ 💪</div>
-    <p>你的勇气值得称赞！再试一次吧！</p>
-    <div class="mt-4 victory-video-container">
-        <!-- 本地视频播放器 -->
-        <video id="defeatVideo" class="victory-video" controls preload="none">
-            <source src="" type="video/mp4">
-            您的浏览器不支持视频播放
-        </video>
-        <!-- 视频控制按钮 -->
-        <div class="video-controls">
-            <button class="btn btn-warning btn-sm" id="skipDefeatVideo">
-                <i class="fas fa-forward"></i> 跳过视频
-            </button>
-            <button class="btn btn-info btn-sm" id="replayDefeatVideo" style="display: none;">
-                <i class="fas fa-redo"></i> 重新播放
-            </button>
+    <div class="victory-screen" id="defeatScreen">
+        <div class="victory-message">💪 再接再厉！ 💪</div>
+        <p>你的勇气值得称赞！再试一次吧！</p>
+        <div class="mt-4 victory-video-container">
+            <!-- 本地视频播放器 -->
+            <video id="defeatVideo" class="victory-video" controls preload="none">
+                <source src="" type="video/mp4">
+                您的浏览器不支持视频播放
+            </video>
+            <!-- 视频控制按钮 -->
+            <div class="video-controls">
+                <button class="btn btn-warning btn-sm" id="skipDefeatVideo">
+                    <i class="fas fa-forward"></i> 跳过视频
+                </button>
+                <button class="btn btn-info btn-sm" id="replayDefeatVideo" style="display: none;">
+                    <i class="fas fa-redo"></i> 重新播放
+                </button>
+            </div>
+            <!-- 加载提示 -->
+            <div class="loading-message" id="defeatVideoLoading">
+                <i class="fas fa-spinner fa-spin"></i> 准备播放失败视频...
+            </div>
         </div>
-        <!-- 加载提示 -->
-        <div class="loading-message" id="defeatVideoLoading">
-            <i class="fas fa-spinner fa-spin"></i> 准备播放失败视频...
-        </div>
+        <button class="btn btn-primary btn-lg mt-4" onclick="window.bossBattle.restartBattle()">
+            <i class="fas fa-redo"></i> 重新挑战
+        </button>
+        <button class="btn btn-success btn-lg mt-4" onclick="window.location.href='../start.html'">
+            <i class="fas fa-home"></i> 返回首页
+        </button>
     </div>
-    <button class="btn btn-primary btn-lg mt-4" onclick="window.bossBattle.restartBattle()">
-        <i class="fas fa-redo"></i> 重新挑战
-    </button>
-    <button class="btn btn-success btn-lg mt-4" onclick="window.location.href='../start.html'">
-        <i class="fas fa-home"></i> 返回首页
-    </button>
-</div>
 
     <!-- 捷拉奥拉攻击动画 -->
-<div class="hero-attack" id="heroAttack">
-    <div class="attack-image" id="attackImage"></div>
-</div>
+    <div class="hero-attack" id="heroAttack">
+        <div class="attack-image" id="attackImage"></div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="boss.js"></script>
