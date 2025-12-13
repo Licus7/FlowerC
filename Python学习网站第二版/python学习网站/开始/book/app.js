@@ -868,7 +868,7 @@ class PracticeSystem {
             const isUnlocked = this.isChapterUnlocked(i);
             const score = this.chapterScores[i] || 0;
             const attempts = this.chapterAttempts[i] || 0;
-            const maxAttempts = 2;
+            const isPassed = score >= 60;
             
             const chapterCard = document.createElement('div');
             chapterCard.className = `chapter-exercise-card ${!isUnlocked ? 'locked' : ''}`;
@@ -878,36 +878,46 @@ class PracticeSystem {
                     <h5>第${i}章</h5>
                     <p>${this.getChapterTitle(i)}</p>
                     <div class="exercise-stats">
-                        ${score > 0 ? `<div class="score">得分: ${score}%</div>` : ''}
-                        ${attempts > 0 ? `<div class="attempts">尝试: ${attempts}/${maxAttempts}</div>` : ''}
+                        ${isPassed ? 
+                            `<div class="score passed">✅ 已通过: ${score}%</div>` : 
+                            score > 0 ? `<div class="score">上次: ${score}%</div>` : ''
+                        }
+                        ${attempts > 0 ? `<div class="attempts">尝试: ${attempts}次</div>` : ''}
+                        ${!isUnlocked ? '<div class="lock-message">完成前一章解锁</div>' : ''}
                     </div>
-                    ${!isUnlocked ? '<div class="lock-message">完成前一章解锁</div>' : ''}
+                    ${isPassed ? '<div class="passed-badge"><i class="fas fa-check-circle"></i> 已完成</div>' : ''}
                 </div>
             `;
             
-            if (isUnlocked && attempts < 2) {
+            // 点击逻辑
+            if (isUnlocked) {
                 chapterCard.addEventListener('click', () => {
                     console.log('点击章节:', i);
                     this.startChapterPractice(i);
                 });
                 chapterCard.style.cursor = 'pointer';
-            } else if (attempts >= 2) {
-                chapterCard.classList.add('max-attempts');
-                chapterCard.innerHTML += '<div class="max-attempts-msg">已达最大尝试次数</div>';
+                chapterCard.classList.add('clickable');
+                
+                if (!isPassed) {
+                    chapterCard.classList.add('needs-practice');
+                }
+            } else {
                 chapterCard.style.cursor = 'not-allowed';
+                chapterCard.style.opacity = '0.6';
             }
             grid.appendChild(chapterCard);
         }
     }
 
+    // ✅ 核心修改：解锁逻辑
     isChapterUnlocked(chapterId) {
         if (chapterId === 1) return true;
         
         const prevChapter = chapterId - 1;
         const prevScore = this.chapterScores[prevChapter] || 0;
-        const prevAttempts = this.chapterAttempts[prevChapter] || 0;
         
-        return prevScore >= 60 && prevAttempts <= 2;
+        // 关键逻辑：只要前一章节分数≥60，就解锁当前章节
+        return prevScore >= 60;
     }
 
     getChapterTitle(chapterId) {
@@ -923,14 +933,26 @@ class PracticeSystem {
         document.querySelectorAll('.chapter-link').forEach(link => {
             const chapterId = parseInt(link.dataset.chapterId);
             const isUnlocked = this.isChapterUnlocked(chapterId);
+            const score = this.chapterScores[chapterId] || 0;
+            const isPassed = score >= 60;
+            
+            // 清理之前的图标和徽章
+            link.querySelectorAll('.fa-lock, .fa-check, .score-badge').forEach(el => el.remove());
             
             if (!isUnlocked) {
                 link.innerHTML += ' <i class="fas fa-lock ms-1" style="font-size: 12px;"></i>';
                 link.style.opacity = '0.6';
             } else {
-                const score = this.chapterScores[chapterId];
-                if (score) {
-                    link.innerHTML += ` <span class="score-badge">${score}%</span>`;
+                link.style.opacity = '1';
+                
+                if (isPassed) {
+                    link.innerHTML += ` <i class="fas fa-check ms-1" style="color: #28a745; font-size: 12px;"></i>`;
+                    if (score > 0) {
+                        link.innerHTML += ` <span class="score-badge" style="background-color: #28a745; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 5px;">${score}%</span>`;
+                    }
+                } else if (score > 0) {
+                    // 有分数但未通过
+                    link.innerHTML += ` <span class="score-badge" style="background-color: #ffc107; color: black; padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 5px;">${score}%</span>`;
                 }
             }
         });
@@ -946,16 +968,17 @@ class PracticeSystem {
                     e.preventDefault();
                     console.log('点击侧边栏章节:', chapterId);
                     
-                    const attempts = this.chapterAttempts[chapterId] || 0;
-                    if (attempts >= 2) {
-                        alert('本章节已尝试2次，无法再次练习！');
-                        return;
-                    }
-                    
                     if (this.isChapterUnlocked(chapterId)) {
                         this.startChapterPractice(chapterId);
                     } else {
-                        alert('请先完成前一章并获得60%以上的分数来解锁此章节！');
+                        const prevChapter = chapterId - 1;
+                        const prevScore = this.chapterScores[prevChapter] || 0;
+                        
+                        if (prevScore > 0) {
+                            alert(`请先完成第${prevChapter}章，当前得分${prevScore}%，需要达到60%才能解锁第${chapterId}章！`);
+                        } else {
+                            alert(`请先完成第${prevChapter}章练习！`);
+                        }
                     }
                 });
             });
@@ -976,12 +999,9 @@ class PracticeSystem {
     }
 
     startChapterPractice(chapterId) {
-        const attempts = this.chapterAttempts[chapterId] || 0;
-        if (attempts >= 2) {
-            alert('本章节已尝试2次，无法再次练习！');
-            return;
-        }
-
+        // ✅ 修改：移除次数限制检查
+        // 用户可以无限次练习，直到通过为止
+        
         this.currentChapter = chapterId;
         this.currentQuestions = practiceQuestions[chapterId] || [];
         this.currentQuestionIndex = 0;
@@ -990,6 +1010,13 @@ class PracticeSystem {
         document.getElementById('chapter-exercises').style.display = 'none';
         document.getElementById('question-area').style.display = 'block';
         document.getElementById('practice-title').textContent = `第${chapterId}章练习 - ${this.getChapterTitle(chapterId)}`;
+        
+        // 显示当前章节状态
+        const score = this.chapterScores[chapterId] || 0;
+        const attempts = this.chapterAttempts[chapterId] || 0;
+        if (score > 0) {
+            document.getElementById('practice-title').textContent += ` (当前: ${score}%, 尝试: ${attempts}次)`;
+        }
         
         this.showQuestion();
         this.updateNavigationButtons();
@@ -1047,9 +1074,11 @@ class PracticeSystem {
         
         if (savedAnswer !== undefined) {
             if (typeof savedAnswer === 'boolean') {
-                document.getElementById(savedAnswer.toString()).checked = true;
+                const element = document.getElementById(savedAnswer.toString());
+                if (element) element.checked = true;
             } else {
-                document.querySelector(`input[value="${savedAnswer}"]`).checked = true;
+                const element = document.querySelector(`input[value="${savedAnswer}"]`);
+                if (element) element.checked = true;
             }
         }
     }
@@ -1129,7 +1158,6 @@ class PracticeSystem {
         });
     }
 
-    // ✅ 新增：安全的金币添加方法
     addCoinsSafely(amount, reason) {
         console.log(`尝试添加金币: ${amount}, 原因: ${reason}`);
         
@@ -1239,7 +1267,6 @@ class PracticeSystem {
         }
     }
 
-    // ✅ 修改：在原calculateScore函数中添加进度同步
     calculateScore() {
         let correctCount = 0;
         this.currentQuestions.forEach(question => {
@@ -1250,95 +1277,124 @@ class PracticeSystem {
         });
         
         const score = Math.round((correctCount / this.currentQuestions.length) * 100);
+        const totalQuestions = this.currentQuestions.length;
         
+        // 保存分数和尝试次数
+        const oldScore = this.chapterScores[this.currentChapter] || 0;
         this.chapterScores[this.currentChapter] = score;
         this.chapterAttempts[this.currentChapter] = (this.chapterAttempts[this.currentChapter] || 0) + 1;
         this.saveScores();
         
-        // ✅ 新增：同步到进度管理器（非破坏性添加）
-        this.syncProgressToManager(score, correctCount);
-        
-        this.showChapterResult(score, correctCount);
-    }
-    
-    // ✅ 新增：同步到进度管理器
-    syncProgressToManager(score, correctCount) {
-        console.log(`同步章节 ${this.currentChapter} 进度: ${score}% (${correctCount}/${this.currentQuestions.length})`);
-        
-        // 方法1：使用全局进度管理器
-        if (window.progressManager && typeof window.progressManager.updateChapterProgress === 'function') {
-            window.progressManager.updateChapterProgress(
-                this.currentChapter,
-                score,
-                correctCount,
-                this.currentQuestions.length
-            );
-            console.log('✅ 已同步到全局进度管理器');
-        } 
-        // 方法2：直接保存到新格式
-        else {
-            this.saveToNewProgressFormat(score, correctCount);
-        }
-    }
-    
-    // ✅ 新增：保存到新进度格式
-    saveToNewProgressFormat(score, correctCount) {
-        try {
-            // 读取现有进度
-            const existing = JSON.parse(localStorage.getItem('userProgress_v3')) || {
-                chapters: {},
-                bossDefeated: false,
-                lastUpdated: null
-            };
-            
-            // 更新当前章节
-            existing.chapters[this.currentChapter] = {
-                completed: score >= 60,
-                score: score,
-                accuracy: Math.round((correctCount / this.currentQuestions.length) * 100),
-                questionsAnswered: correctCount,
-                totalQuestions: this.currentQuestions.length,
-                lastUpdated: new Date().toISOString()
-            };
-            
-            existing.lastUpdated = new Date().toISOString();
-            
-            // 保存
-            localStorage.setItem('userProgress_v3', JSON.stringify(existing));
-            console.log('✅ 已保存到 userProgress_v3 格式');
-        } catch (e) {
-            console.warn('保存到新格式失败:', e);
-        }
+        this.showChapterResult(score, correctCount, totalQuestions, oldScore);
     }
 
-    showChapterResult(score, correctCount) {
-        const totalQuestions = this.currentQuestions.length;
+    showChapterResult(score, correctCount, totalQuestions, oldScore) {
         const feedback = document.getElementById('answer-feedback');
-        
+        const attempts = this.chapterAttempts[this.currentChapter] || 0;
+        const isPassed = score >= 60;
+        const wasPassed = oldScore >= 60;
         const chapterBonus = correctCount * 3;
         
-        feedback.innerHTML = `
-            <div class="alert ${score >= 60 ? 'alert-success' : 'alert-warning'}">
-                <h5><i class="fas ${score >= 60 ? 'fa-trophy' : 'fa-exclamation-triangle'}"></i> 章节完成！</h5>
-                <p>得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
-                <p>🎉 章节完成奖励：+${chapterBonus}金币！</p>
-                <p>${score >= 60 ? '恭喜！已解锁下一章节！' : '未达到60%，请重新尝试！'}</p>
-                <p>本章剩余尝试次数: ${2 - this.chapterAttempts[this.currentChapter]}</p>
-            </div>
-        `;
-        feedback.style.display = 'block';
+        // ✅ 新增：第一次通过奖励
+        const firstTimePassBonus = !wasPassed && isPassed ? 20 : 0;
         
-        // ✅ 章节完成也给金币
-        if (chapterBonus > 0) {
-            this.addCoinsSafely(chapterBonus, '章节完成奖励');
+        let alertType = 'alert-warning';
+        let icon = 'fa-exclamation-triangle';
+        let title = '章节练习完成';
+        let message = '';
+        
+        if (isPassed) {
+            alertType = 'alert-success';
+            icon = 'fa-trophy';
+            title = '恭喜通过！';
+            
+            if (!wasPassed) {
+                // 第一次通过
+                message = `
+                    <p>🎉 <strong>首次通过！</strong> +${firstTimePassBonus}金币奖励！</p>
+                    <p>✅ 您已掌握本章内容，可以继续下一章了</p>
+                    ${this.currentChapter < 10 ? `<p>🔓 <strong>第${this.currentChapter + 1}章已解锁！</strong></p>` : '<p>🎊 恭喜！您已完成所有章节！</p>'}
+                `;
+            } else {
+                // 已经通过过，再次练习
+                message = `
+                    <p>📚 复习完成！本次得分: ${score}%</p>
+                    <p>${score > oldScore ? `📈 比上次提高了${score - oldScore}%！` : ''}</p>
+                `;
+            }
+        } else {
+            // 未通过
+            alertType = 'alert-info';
+            icon = 'fa-redo-alt';
+            title = '继续努力';
+            
+            message = `
+                <p>📝 当前得分: ${score}%，距离通过还差${60 - score}%</p>
+                <p>💡 建议：复习错题后再次尝试</p>
+                <p>🔄 您已尝试 ${attempts} 次，可以无限次练习直到通过</p>
+            `;
         }
         
+        feedback.innerHTML = `
+            <div class="alert ${alertType}">
+                <h5><i class="fas ${icon}"></i> ${title}</h5>
+                <p>得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
+                <p>尝试次数: ${attempts}次 ${oldScore > 0 ? `(上次: ${oldScore}%)` : ''}</p>
+                ${chapterBonus > 0 ? `<p>💰 答题奖励: +${chapterBonus}金币</p>` : ''}
+                ${firstTimePassBonus > 0 ? `<p>🏆 首次通过奖励: +${firstTimePassBonus}金币</p>` : ''}
+                ${message}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <button id="review-chapter" class="btn btn-outline-primary btn-sm">复习本章</button>
+                    ${isPassed && this.currentChapter < 10 ? 
+                        `<button id="next-chapter" class="btn btn-success btn-sm">前往第${this.currentChapter + 1}章</button>` : 
+                        ''
+                    }
+                    <button id="back-to-list" class="btn btn-secondary btn-sm">返回章节列表</button>
+                </div>
+            </div>
+        `;
+        
+        feedback.style.display = 'block';
+        
+        // 添加金币
+        if (chapterBonus > 0) {
+            this.addCoinsSafely(chapterBonus, '章节答题奖励');
+        }
+        if (firstTimePassBonus > 0) {
+            this.addCoinsSafely(firstTimePassBonus, '首次通过章节奖励');
+        }
+        
+        // 绑定按钮事件
         setTimeout(() => {
-            this.renderChapterGrid();
-            this.updateSidebarStatus();
-            document.getElementById('question-area').style.display = 'none';
-            document.getElementById('chapter-exercises').style.display = 'grid';
-        }, 3000);
+            const reviewBtn = document.getElementById('review-chapter');
+            const nextChapterBtn = document.getElementById('next-chapter');
+            const backBtn = document.getElementById('back-to-list');
+            
+            if (reviewBtn) {
+                reviewBtn.addEventListener('click', () => {
+                    this.startChapterPractice(this.currentChapter);
+                });
+            }
+            
+            if (nextChapterBtn) {
+                nextChapterBtn.addEventListener('click', () => {
+                    const nextChapter = this.currentChapter + 1;
+                    if (this.isChapterUnlocked(nextChapter)) {
+                        this.startChapterPractice(nextChapter);
+                    }
+                });
+            }
+            
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    this.renderChapterGrid();
+                    this.updateSidebarStatus();
+                    document.getElementById('question-area').style.display = 'none';
+                    document.getElementById('chapter-exercises').style.display = 'grid';
+                });
+            }
+        }, 100);
     }
 }
 
@@ -1366,23 +1422,4 @@ if (window.location.pathname.includes('practice.html') ||
             }, 500);
         }
     }, 500);
-}
-
-// ✅ 可选：添加进度管理器加载（非必须，因为profile.html已加载）
-function loadProgressManagerIfNeeded() {
-    if (typeof ProgressManager === 'undefined') {
-        console.log('尝试加载进度管理器...');
-        const script = document.createElement('script');
-        script.src = '../progressManager.js'; // 根据实际路径调整
-        script.onload = () => console.log('进度管理器加载完成');
-        script.onerror = () => console.warn('进度管理器加载失败');
-        document.head.appendChild(script);
-    }
-}
-
-// 页面加载完成后尝试加载
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadProgressManagerIfNeeded);
-} else {
-    loadProgressManagerIfNeeded();
 }
