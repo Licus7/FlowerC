@@ -233,18 +233,15 @@
 
     // ===== 系统常量 =====
     const LOTTERY_COST = 20;
-    const GIF_BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated';
-    const GIF_BACKUP_URL = 'https://play.pokemonshowdown.com/sprites/ani';
-    const STATIC_BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon';
+    const LOCAL_BASE_PATH = 'pokemon_gifs/';
     
     // ===== 图片获取系统 =====
     function getPokemonImage(id, useGif = true) {
+        // 使用本地图片
         if (useGif) {
-            // 主GIF地址
-            return `${GIF_BASE_URL}/${id}.gif`;
+            return `${LOCAL_BASE_PATH}${id}.gif`;
         }
-        // 静态备用
-        return `${STATIC_BASE_URL}/${id}.png`;
+        return `${LOCAL_BASE_PATH}${id}.png`;
     }
     
     // 获取英文名用于备用地址
@@ -267,20 +264,15 @@
         
         switch(attempt) {
             case 1:
-                // 第一次失败：尝试备用GIF地址
-                imgElement.src = `${GIF_BACKUP_URL}/${getPokemonSlug(id)}.gif`;
+                // 第一次失败：尝试PNG
+                imgElement.src = `${LOCAL_BASE_PATH}${id}.png`;
                 imgElement.onerror = () => handleImageError(imgElement, id, 2);
                 break;
             case 2:
-                // 第二次失败：尝试静态图片
-                imgElement.src = getPokemonImage(id, false);
-                imgElement.onerror = () => handleImageError(imgElement, id, 3);
-                break;
-            case 3:
-                // 第三次失败：使用默认GIF
-                imgElement.src = 'assets/pokemon/pikachu.gif';
+                // 第二次失败：使用在线PNG
+                imgElement.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
                 imgElement.onerror = null;
-                console.warn(`精灵 ${id} 的所有图片源都失败，使用默认图片`);
+                console.warn(`精灵 ${id} 的本地图片失败，使用在线图片`);
                 break;
         }
     }
@@ -464,55 +456,60 @@
     }
     
     // ===== 宠物收藏系统 =====
-    function saveNewPet(pet) {
-        let myPets = JSON.parse(localStorage.getItem('myPets') || '[]');
+  function saveNewPet(pet) {
+    let myPets = JSON.parse(localStorage.getItem('myPets') || '[]');
+    
+    // 检查是否已拥有
+    const existingIndex = myPets.findIndex(p => p.id === pet.id);
+    
+    if (existingIndex === -1) {
+        // 新宠物 - 使用兼容格式
+        const newPet = {
+            id: pet.id,
+            name: pet.name,
+            image: `pokemon_gifs/${pet.id}.gif`,  // 统一使用本地路径
+            rarity: pet.rarity,
+            type: pet.type,
+            typeName: pet.typeName,
+            description: pet.description,
+            obtainedDate: new Date().toLocaleDateString('zh-CN'),
+            obtainedTime: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'}),
+            isNew: true,
+            // 添加companion.js需要的字段
+            obtainedDate: new Date().toISOString().split('T')[0],
+            // 确保字段名一致
+        };
         
-        // 检查是否已拥有
-        const existingIndex = myPets.findIndex(p => p.id === pet.id);
+        myPets.push(newPet);
+        localStorage.setItem('myPets', JSON.stringify(myPets));
         
-        if (existingIndex === -1) {
-            // 新宠物
-            const newPet = {
-                id: pet.id,
-                name: pet.name,
-                image: getPokemonImage(pet.id, true),
-                rarity: pet.rarity,
-                type: pet.type,
-                typeName: pet.typeName,
-                description: pet.description,
-                obtainedDate: new Date().toLocaleDateString('zh-CN'),
-                obtainedTime: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute:'2-digit'}),
-                isNew: true,
-                isGif: true
-            };
-            
-            myPets.push(newPet);
-            localStorage.setItem('myPets', JSON.stringify(myPets));
-            
-            // 显示获得通知
-            showPetObtainedNotification(pet);
-            
-            // 重新加载收藏
-            setTimeout(() => loadMyPets(), 500);
-            
-        } else {
-            // 重复获得，奖励金币
-            const bonusCoins = {
-                'common': 15,
-                'rare': 25,
-                'epic': 40,
-                'legendary': 75
-            };
-            
-            const bonus = bonusCoins[pet.rarity] || 15;
-            addCoins(bonus, `重复获得${pet.name}`);
-            
-            showNotification(
-                `✨ ${pet.name} 已拥有，转化为${bonus}金币！`, 
-                'info'
-            );
-        }
+        console.log('保存新精灵:', newPet);
+        console.log('当前总精灵数:', myPets.length);
+        
+        // 显示获得通知
+        showPetObtainedNotification(pet);
+        
+        // 重新加载收藏
+        setTimeout(() => loadMyPets(), 500);
+        
+    } else {
+        // 重复获得，奖励金币
+        const bonusCoins = {
+            'common': 15,
+            'rare': 25,
+            'epic': 40,
+            'legendary': 75
+        };
+        
+        const bonus = bonusCoins[pet.rarity] || 15;
+        addCoins(bonus, `重复获得${pet.name}`);
+        
+        showNotification(
+            `✨ ${pet.name} 已拥有，转化为${bonus}金币！`, 
+            'info'
+        );
     }
+}
     
     function loadMyPets() {
         const myPets = JSON.parse(localStorage.getItem('myPets') || '[]');
@@ -794,6 +791,26 @@
         });
     }
     
+// ===== 预加载系统 =====
+function preloadAllImages() {
+    console.log('🔄 预加载所有精灵图片...');
+    
+    const allIds = [25, 4, 7, 1, 133, 39, 52, 129, 10, 16, 26, 5, 8, 2, 134, 136, 135, 55, 130, 59, 131, 143, 149, 144, 145, 146, 150];
+    
+    allIds.forEach(id => {
+        // 预加载GIF
+        const gifImg = new Image();
+        gifImg.src = `pokemon_gifs/${id}.gif`;
+        
+        // 预加载PNG作为备用
+        const pngImg = new Image();
+        pngImg.src = `pokemon_gifs/${id}.png`;
+    });
+    
+    console.log('✅ 预加载完成');
+}
+
+
     // 页面加载后初始化
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializeLotterySystem);
@@ -803,3 +820,4 @@
     
     console.log('🎰 宝可梦GIF抽奖系统脚本加载完成');
 })();
+
