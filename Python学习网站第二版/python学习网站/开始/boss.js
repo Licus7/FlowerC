@@ -14,9 +14,7 @@ class BossBattleEnhanced {
         this.bossRageMode = false;
         
         // 特效控制
-        this.magikarpInterval = null;
         this.lightningInterval = null;
-        this.magikarpCount = 8; // 正常阶段鲤鱼王数量
         
         // 音频元素引用
         this.roarSound = null;
@@ -153,7 +151,6 @@ class BossBattleEnhanced {
                 
             } else if (this.bossHealth <= 600) {
                 healthBar.classList.add('low-health');
-                this.magikarpCount = 6;
                 
                 // 更新血条颜色为橙色
                 if (healthFill) {
@@ -184,9 +181,11 @@ class BossBattleEnhanced {
         bossBg.classList.add('boss-raging');
         bossBg.classList.remove('boss-breathing');
         
-        // 鲤鱼王惊散效果
-        this.createMagikarpScatter();
-        
+        if (this.roarSound) {
+            this.roarSound.currentTime = 0;
+            this.roarSound.play();
+        }
+
         // 恢复效果
         setTimeout(() => {
             bossBg.classList.add('boss-breathing');
@@ -240,180 +239,6 @@ class BossBattleEnhanced {
         }
     }
 
-    // 在湖中创建鲤鱼王
-    createMagikarpSchool() {
-        const lakeArea = document.getElementById('lakeArea');
-        if (!lakeArea) return;
-        
-        // 清除已有的鲤鱼王
-        document.querySelectorAll('.magikarp-gif').forEach(el => el.remove());
-        
-        // 创建鲤鱼王
-        for (let i = 0; i < this.magikarpCount; i++) {
-            this.createSingleMagikarp(i, lakeArea);
-        }
-        
-        console.log(`在湖中创建了${this.magikarpCount}条鲤鱼王`);
-        
-        // 设置定时器，5秒后重新创建
-        if (this.magikarpInterval) clearInterval(this.magikarpInterval);
-        this.magikarpInterval = setInterval(() => {
-            this.createMagikarpSchool();
-        }, 5000);
-    }
-
-    // 创建单个鲤鱼王
-    createSingleMagikarp(index, lakeArea) {
-        const magikarp = document.createElement('img');
-        magikarp.className = 'magikarp-gif';
-        magikarp.alt = '鲤鱼王';
-        
-        // 使用鲤鱼王GIF
-        const gifUrls = [
-            'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/129.gif',
-            'https://play.pokemonshowdown.com/sprites/ani/magikarp.gif'
-        ];
-        magikarp.src = gifUrls[Math.floor(Math.random() * gifUrls.length)];
-        
-        // 在湖区域内随机位置
-        const posX = Math.random() * 100;
-        const posY = 30 + Math.random() * 40;
-        
-        // 随机大小（60-120px）
-        const size = 60 + Math.random() * 60;
-        
-        // 随机旋转角度
-        const rotation = Math.random() * 30 - 15;
-        
-        // 设置样式
-        magikarp.style.cssText = `
-            position: fixed;
-            left: ${posX}%;
-            top: ${posY}%;
-            width: ${size}px;
-            height: auto;
-            opacity: 0;
-            z-index: 2;
-            pointer-events: none;
-            filter: brightness(0.9) contrast(1.2) drop-shadow(0 0 8px rgba(0, 150, 255, 0.7));
-            transform: translate(-50%, -50%) rotate(${rotation}deg);
-            animation: magikarpAppear${index} 1s ease-out forwards, magikarpFloat${index} 3s ease-in-out infinite;
-        `;
-        
-        // 添加动画延迟
-        const delay = Math.random() * 2;
-        magikarp.style.animationDelay = `${delay}s, ${delay + 1}s`;
-        
-        // 创建动画
-        this.createMagikarpAnimations(index, rotation);
-        
-        // 随机方向
-        if (Math.random() > 0.5) {
-            magikarp.style.transform += ' scaleX(-1)';
-        }
-        
-        lakeArea.appendChild(magikarp);
-        
-        // 3-8秒后消失
-        const disappearTime = 3000 + Math.random() * 5000;
-        setTimeout(() => {
-            this.fadeOutMagikarp(magikarp);
-        }, disappearTime);
-    }
-
-    // 创建鲤鱼王动画
-    createMagikarpAnimations(index, rotation) {
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes magikarpAppear${index} {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(${rotation}deg); }
-                100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1) rotate(${rotation}deg); }
-            }
-            
-            @keyframes magikarpFloat${index} {
-                0%, 100% { transform: translate(-50%, -50%) rotate(${rotation}deg) translateY(0px); }
-                50% { transform: translate(-50%, -50%) rotate(${rotation}deg) translateY(-10px); }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // 鲤鱼王淡出效果
-    fadeOutMagikarp(magikarp) {
-        if (!magikarp.parentNode) return;
-        
-        magikarp.style.transition = 'opacity 1.5s ease-out, transform 1.5s ease-out';
-        magikarp.style.opacity = '0';
-        magikarp.style.transform += ' scale(0.5)';
-        
-        setTimeout(() => {
-            if (magikarp.parentNode) {
-                magikarp.remove();
-            }
-        }, 1500);
-    }
-
-    // 鲤鱼王惊散效果（Boss受击时）
-    createMagikarpScatter() {
-        const scatterCount = 3 + Math.floor(Math.random() * 3);
-        
-        for (let i = 0; i < scatterCount; i++) {
-            setTimeout(() => {
-                const lakeArea = document.getElementById('lakeArea');
-                if (!lakeArea) return;
-                
-                const magikarp = document.createElement('img');
-                magikarp.className = 'magikarp-gif scatter';
-                magikarp.alt = '鲤鱼王';
-                magikarp.src = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/129.gif';
-                
-                // 从中心散开
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 20 + Math.random() * 30;
-                const endX = 50 + Math.cos(angle) * distance;
-                const endY = 50 + Math.sin(angle) * distance;
-                
-                magikarp.style.cssText = `
-                    position: fixed;
-                    left: 50%;
-                    top: 50%;
-                    width: ${40 + Math.random() * 40}px;
-                    height: auto;
-                    opacity: 0.8;
-                    z-index: 2;
-                    pointer-events: none;
-                    filter: brightness(1.2) drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
-                    transform: translate(-50%, -50%);
-                    animation: magikarpScatter${i} 0.8s ease-out forwards;
-                `;
-                
-                // 散开动画
-                const scatterStyle = document.createElement('style');
-                scatterStyle.textContent = `
-                    @keyframes magikarpScatter${i} {
-                        0% { 
-                            transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                            opacity: 0.8;
-                        }
-                        100% { 
-                            transform: translate(-50%, -50%) translate(${endX - 50}%, ${endY - 50}%) scale(0.5) rotate(${Math.random() * 360}deg);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                document.head.appendChild(scatterStyle);
-                
-                lakeArea.appendChild(magikarp);
-                
-                setTimeout(() => {
-                    if (magikarp.parentNode) {
-                        magikarp.remove();
-                    }
-                }, 800);
-            }, i * 100);
-        }
-    }
-
     // 随机闪电效果
     startRandomLightning() {
         if (this.lightningInterval) clearInterval(this.lightningInterval);
@@ -439,7 +264,8 @@ class BossBattleEnhanced {
         
         // 激活闪电效果
         lightning.classList.add('active');
-        this.screenShake(0.15);
+        // BUG修复：使用固定震动强度
+        this.screenShake();
         
         // 血量低时闪电更强
         if (this.bossHealth < 300) {
@@ -458,7 +284,6 @@ class BossBattleEnhanced {
     
     startEnvironmentEffects() {
         this.startRandomLightning();
-        this.createMagikarpSchool();
         console.log('环境特效已启动');
     }
 
@@ -468,37 +293,14 @@ class BossBattleEnhanced {
         
         // 使用狂暴阶段闪电
         this.startFuriousLightning();
-        
-        // 狂暴阶段增加鲤鱼王数量
-        this.magikarpCount = 10;
-        this.createMagikarpSchool();
-        
-        // 改变鲤鱼王颜色为红色
-        setTimeout(() => {
-            document.querySelectorAll('.magikarp-gif').forEach(magikarp => {
-                if (!magikarp.classList.contains('scatter')) {
-                    magikarp.style.filter = 'brightness(1.3) hue-rotate(-30deg) contrast(1.5) drop-shadow(0 0 10px rgba(255, 0, 0, 0.7))';
-                }
-            });
-        }, 1000);
     }
 
     // 停止环境特效
     stopEnvironmentEffects() {
-        if (this.magikarpInterval) {
-            clearInterval(this.magikarpInterval);
-            this.magikarpInterval = null;
-        }
-        
         if (this.lightningInterval) {
             clearInterval(this.lightningInterval);
             this.lightningInterval = null;
         }
-        
-        // 渐隐清除所有鲤鱼王
-        document.querySelectorAll('.magikarp-gif').forEach(magikarp => {
-            this.fadeOutMagikarp(magikarp);
-        });
     }
 
     // ==================== 阶段过渡 ====================
@@ -529,9 +331,6 @@ class BossBattleEnhanced {
                 }
                 
             }, 500);
-            
-            // 增加鲤鱼王惊散效果
-            this.createMagikarpScatter(5);
             
             // 播放愤怒音效
             setTimeout(() => {
@@ -564,9 +363,6 @@ class BossBattleEnhanced {
                 
             }, 500);
             
-            // 创建多个鲤鱼王惊散
-            this.createMagikarpScatter(8);
-            
             // 播放狂暴音效（连续吼叫）
             setTimeout(() => {
                 this.playRoarSound();
@@ -582,8 +378,8 @@ class BossBattleEnhanced {
             this.changeRainColor('#ff3333');
         }
         
-        // 强力屏幕震动
-        this.screenShake(1.5);
+        // BUG修复：统一使用固定强度的屏幕震动
+        this.screenShake();
         
         // 显示阶段标题
         const phaseMessages = { 
@@ -633,7 +429,7 @@ class BossBattleEnhanced {
             if (Math.random() > 0.6 && !this.isAnimating) {
                 this.createLightning();
             }
-        }, 8000); // 每8秒有40%几率
+        }, 8000);
     }
 
     // 狂暴阶段闪电
@@ -650,7 +446,7 @@ class BossBattleEnhanced {
                     }, 200);
                 }
             }
-        }, 5000); // 每5秒有60%几率
+        }, 5000);
     }
 
     // 改变雨滴颜色
@@ -674,7 +470,8 @@ class BossBattleEnhanced {
         for (let i = 0; i < 3; i++) {
             setTimeout(() => {
                 lightning.classList.add('active');
-                this.screenShake(0.2);
+                // BUG修复：统一使用固定强度的屏幕震动
+                this.screenShake();
                 
                 // 不同阶段的闪电颜色
                 if (this.bossHealth <= 300) {
@@ -1036,19 +833,20 @@ class BossBattleEnhanced {
         });
     }
 
-    // 屏幕震动
-    screenShake(intensity = 1) {
+    // 屏幕震动 - BUG修复：统一震动强度，移除强度参数
+    screenShake() {
         if (this.isShaking) return;
         this.isShaking = true;
         
         const battleScene = document.getElementById('battleScene');
         if (battleScene) {
+            // 使用固定的震动效果
             battleScene.classList.add('screen-shake');
 
             setTimeout(() => {
                 battleScene.classList.remove('screen-shake');
                 this.isShaking = false;
-            }, 500 * intensity);
+            }, 500);
         } else {
             this.isShaking = false;
         }
@@ -1124,7 +922,7 @@ class BossBattleEnhanced {
 
     // ==================== 游戏结束 ====================
     
-    // 检查胜利条件 - 修复版
+    // 检查胜利条件
     checkVictory() {
         console.log(`检查胜利条件 - Boss血量: ${this.bossHealth}`);
         
@@ -1143,7 +941,7 @@ class BossBattleEnhanced {
             // 屏幕变暗
             this.darkenScreen();
             
-            // 播放胜利音效（如果需要）
+            // 播放胜利音效
             this.playRoarSound();
             
             // 延迟显示胜利界面
@@ -1228,7 +1026,6 @@ class BossBattleEnhanced {
         this.bossHealth = 1000;
         this.playerHealth = 5;
         this.bossRageMode = false;
-        this.magikarpCount = 8;
         this.isAnimating = false;
         this.hasRoarPlayed = false;
         this.hasHeroSoundPlayed = false;

@@ -821,3 +821,88 @@ function preloadAllImages() {
     console.log('🎰 宝可梦GIF抽奖系统脚本加载完成');
 })();
 
+// ===== 预加载系统 =====
+function preloadAllImages() {
+    console.log('🔄 预加载所有精灵图片...');
+    
+    // 所有精灵的ID
+    const allIds = [25, 4, 7, 1, 133, 39, 52, 129, 10, 16, 26, 5, 8, 2, 134, 136, 135, 55, 130, 59, 131, 143, 149, 144, 145, 146, 150];
+    
+    allIds.forEach(id => {
+        // 预加载GIF
+        const gifImg = new Image();
+        gifImg.src = `pokemon_gifs/${id}.gif`;
+        
+        // 预加载PNG作为备用
+        const pngImg = new Image();
+        pngImg.src = `pokemon_gifs/${id}.png`;
+    });
+    
+    console.log('✅ 预加载完成');
+}
+
+// 立即开始预加载
+if (typeof window !== 'undefined') {
+    window.addEventListener('load', function() {
+        // 延迟预加载，避免阻塞页面
+        setTimeout(preloadAllImages, 1000);
+    });
+    
+    // 暴露预加载函数给其他页面使用
+    window.preloadPokemonImages = preloadAllImages;
+}
+
+// 懒加载系统
+class LazyLoader {
+    constructor() {
+        this.observer = null;
+        this.initObserver();
+    }
+    
+    initObserver() {
+        if ('IntersectionObserver' in window) {
+            this.observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        this.loadImage(img);
+                        this.observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '50px 0px', // 提前50px加载
+                threshold: 0.01
+            });
+        }
+    }
+    
+    loadImage(imgElement) {
+        const src = imgElement.dataset.src;
+        if (!src) return;
+        
+        // 先显示一个占位符
+        imgElement.style.background = '#f0f0f0';
+        
+        const img = new Image();
+        img.onload = () => {
+            imgElement.src = src;
+            imgElement.style.opacity = '1';
+        };
+        img.src = src;
+    }
+    
+    addImage(imgElement) {
+        if (this.observer) {
+            this.observer.observe(imgElement);
+        } else {
+            // 不支持Observer，直接加载
+            this.loadImage(imgElement);
+        }
+    }
+}
+
+// 使用示例
+const lazyLoader = new LazyLoader();
+document.querySelectorAll('img[data-src]').forEach(img => {
+    lazyLoader.addImage(img);
+});

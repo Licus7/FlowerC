@@ -779,6 +779,7 @@ class PracticeSystem {
         this.currentQuestionIndex = 0;
         this.currentQuestions = [];
         this.userAnswers = {};
+        this.questionResults = {}; // 新增：记录每道题的正确性
         this.chapterScores = this.getStoredScores();
         this.chapterAttempts = this.getStoredAttempts();
         
@@ -1006,6 +1007,7 @@ class PracticeSystem {
         this.currentQuestions = practiceQuestions[chapterId] || [];
         this.currentQuestionIndex = 0;
         this.userAnswers = {};
+        this.questionResults = {}; // 重置题目结果
         
         document.getElementById('chapter-exercises').style.display = 'none';
         document.getElementById('question-area').style.display = 'block';
@@ -1091,10 +1093,20 @@ class PracticeSystem {
         }
 
         const questionId = this.currentQuestions[this.currentQuestionIndex].id;
-        this.userAnswers[questionId] = selectedAnswer;
-
         const question = this.currentQuestions[this.currentQuestionIndex];
+        
+        // 保存用户答案
+        this.userAnswers[questionId] = selectedAnswer;
+        
+        // 检查答案是否正确
         const isCorrect = this.checkAnswer(selectedAnswer, question);
+        
+        // 保存题目结果（用于最终统计）
+        this.questionResults[questionId] = {
+            userAnswer: selectedAnswer,
+            isCorrect: isCorrect,
+            question: question
+        };
         
         this.showFeedback(isCorrect, question.explanation);
         
@@ -1103,26 +1115,64 @@ class PracticeSystem {
         }
     }
 
+    // 获取选择答案
     getSelectedAnswer() {
         const selected = document.querySelector('input[name="answer"]:checked');
         if (!selected) return null;
         
-        if (selected.value === 'true') return true;
-        if (selected.value === 'false') return false;
-        return parseInt(selected.value);
+        const value = selected.value;
+        
+        if (value === 'true') return true;
+        if (value === 'false') return false;
+        
+        // 处理选择题选项
+        const numValue = parseInt(value);
+        if (!isNaN(numValue)) {
+            return numValue;
+        }
+        
+        return value;
     }
 
+    // 检查答案
     checkAnswer(selected, question) {
-        return selected === question.answer;
+        // 统一处理答案类型
+        const userAnswer = typeof selected === 'string' ? selected.toLowerCase().trim() : selected;
+        const correctAnswer = question.answer;
+        
+        console.log(`检查答案: 用户答案 = ${userAnswer}, 正确答案 = ${correctAnswer}, 类型: ${question.type}`);
+        
+        if (question.type === 'choice') {
+            // 选择题：比较索引
+            if (typeof correctAnswer === 'number') {
+                return parseInt(userAnswer) === correctAnswer;
+            } else {
+                // 如果答案是字符串选项内容
+                const optionIndex = question.options.findIndex(opt => 
+                    opt.toLowerCase().trim() === userAnswer.toLowerCase().trim()
+                );
+                return optionIndex !== -1 && optionIndex === correctAnswer;
+            }
+        } else {
+            // 判断题
+            if (typeof correctAnswer === 'boolean') {
+                return userAnswer === correctAnswer;
+            } else {
+                // 如果正确答案是字符串形式
+                return userAnswer.toString() === correctAnswer.toString();
+            }
+        }
     }
 
+    // ✅ 恢复原来的金币奖励逻辑
     showFeedback(isCorrect, explanation) {
         const feedback = document.getElementById('answer-feedback');
+        const questionId = this.currentQuestions[this.currentQuestionIndex].id;
+        
+        // ✅ 恢复原来的逻辑：检查之前是否答对过
+        const previouslyCorrect = this.userAnswers[questionId] === true;
         
         if (isCorrect) {
-            const questionId = this.currentQuestions[this.currentQuestionIndex].id;
-            const previouslyCorrect = this.userAnswers[questionId] === true;
-            
             feedback.innerHTML = `
                 <div class="alert alert-success">
                     <i class="fas fa-check"></i>
@@ -1131,11 +1181,12 @@ class PracticeSystem {
                 </div>
             `;
             
-            // ✅ 修复：使用安全的金币添加方法
+            // ✅ 恢复原来的逻辑：只有第一次答对才给金币
             if (!previouslyCorrect) {
                 this.addCoinsSafely(5, '答对题目');
             }
             
+            // ✅ 恢复原来的逻辑：设置userAnswers为true
             this.userAnswers[questionId] = true;
         } else {
             feedback.innerHTML = `
@@ -1145,7 +1196,7 @@ class PracticeSystem {
                 </div>
             `;
             
-            const questionId = this.currentQuestions[this.currentQuestionIndex].id;
+            // ✅ 恢复原来的逻辑：设置userAnswers为false
             this.userAnswers[questionId] = false;
         }
         
@@ -1267,17 +1318,32 @@ class PracticeSystem {
         }
     }
 
+    // ✅ 修复：正确计算分数
     calculateScore() {
         let correctCount = 0;
+        let totalQuestions = this.currentQuestions.length;
+        
+        console.log('=== 开始计算分数 ===');
+        console.log(`总题目数: ${totalQuestions}`);
+        
+        // ✅ 使用原来的userAnswers逻辑统计
         this.currentQuestions.forEach(question => {
-            const userAnswer = this.userAnswers[question.id];
-            if (userAnswer !== undefined && this.checkAnswer(userAnswer, question)) {
+            const questionId = question.id;
+            const userAnswer = this.userAnswers[questionId];
+            
+            // 原来逻辑：userAnswers保存的是布尔值（true=答对，false=答错）
+            if (userAnswer === true) {
                 correctCount++;
+                console.log(`✅ 题目 ${questionId}: 答案正确`);
+            } else {
+                console.log(`❌ 题目 ${questionId}: 答案错误或未作答`);
             }
         });
         
-        const score = Math.round((correctCount / this.currentQuestions.length) * 100);
-        const totalQuestions = this.currentQuestions.length;
+        // 计算百分比
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        
+        console.log(`📊 统计结果: 正确数 = ${correctCount}/${totalQuestions}, 得分 = ${score}%`);
         
         // 保存分数和尝试次数
         const oldScore = this.chapterScores[this.currentChapter] || 0;
@@ -1288,26 +1354,21 @@ class PracticeSystem {
         this.showChapterResult(score, correctCount, totalQuestions, oldScore);
     }
 
+    // ✅ 恢复原来的金币奖励逻辑
     showChapterResult(score, correctCount, totalQuestions, oldScore) {
         const feedback = document.getElementById('answer-feedback');
         const attempts = this.chapterAttempts[this.currentChapter] || 0;
         const isPassed = score >= 60;
         const wasPassed = oldScore >= 60;
-        const chapterBonus = correctCount * 3;
-        
-        // ✅ 新增：第一次通过奖励
+        const chapterBonus = correctCount * 3; // 每正确一题3金币
         const firstTimePassBonus = !wasPassed && isPassed ? 20 : 0;
         
-        let alertType = 'alert-warning';
-        let icon = 'fa-exclamation-triangle';
-        let title = '章节练习完成';
-        let message = '';
+        let alertType = isPassed ? 'alert-success' : 'alert-warning';
+        let icon = isPassed ? 'fa-trophy' : 'fa-exclamation-triangle';
+        let title = isPassed ? '恭喜通过！' : '继续努力';
         
+        let message = '';
         if (isPassed) {
-            alertType = 'alert-success';
-            icon = 'fa-trophy';
-            title = '恭喜通过！';
-            
             if (!wasPassed) {
                 // 第一次通过
                 message = `
@@ -1324,10 +1385,6 @@ class PracticeSystem {
             }
         } else {
             // 未通过
-            alertType = 'alert-info';
-            icon = 'fa-redo-alt';
-            title = '继续努力';
-            
             message = `
                 <p>📝 当前得分: ${score}%，距离通过还差${60 - score}%</p>
                 <p>💡 建议：复习错题后再次尝试</p>
@@ -1338,8 +1395,8 @@ class PracticeSystem {
         feedback.innerHTML = `
             <div class="alert ${alertType}">
                 <h5><i class="fas ${icon}"></i> ${title}</h5>
-                <p>得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
-                <p>尝试次数: ${attempts}次 ${oldScore > 0 ? `(上次: ${oldScore}%)` : ''}</p>
+                <p>📊 得分: <strong>${score}%</strong> (${correctCount}/${totalQuestions})</p>
+                <p>🔄 尝试次数: ${attempts}次 ${oldScore > 0 ? `(上次: ${oldScore}%)` : ''}</p>
                 ${chapterBonus > 0 ? `<p>💰 答题奖励: +${chapterBonus}金币</p>` : ''}
                 ${firstTimePassBonus > 0 ? `<p>🏆 首次通过奖励: +${firstTimePassBonus}金币</p>` : ''}
                 ${message}
@@ -1357,7 +1414,7 @@ class PracticeSystem {
         
         feedback.style.display = 'block';
         
-        // 添加金币
+        // ✅ 恢复原来的金币奖励逻辑
         if (chapterBonus > 0) {
             this.addCoinsSafely(chapterBonus, '章节答题奖励');
         }
