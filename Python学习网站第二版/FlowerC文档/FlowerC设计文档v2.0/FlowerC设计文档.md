@@ -30,66 +30,24 @@
 | **MVP** | 最小可行产品 (Minimum Viable Product) |
 | **IndexedDB** | 浏览器内置的客户端数据库 |
 | **Gamification** | 游戏化，将游戏设计元素应用于非游戏场景 |
-| **RPG** | 角色扮演游戏 (Role-Playing Game) |
 | **Toast提示** | 短暂的弹出式通知消息 |
 
 ## 2. 系统架构设计
 
 ### 2.1 架构概览
-FlowerC采用**客户端单页应用(SPA)架构**，所有逻辑和数据处理在浏览器中完成。
-
-```mermaid
-graph TB
-    subgraph “客户端 (浏览器)”
-        subgraph “表示层”
-            UI[UI组件<br/>HTML/CSS]
-        end
-        
-        subgraph “业务逻辑层”
-            App[应用控制器]
-            LM[学习管理模块]
-            GM[游戏化模块]
-            AM[认证与状态管理]
-        end
-        
-        subgraph “数据访问层”
-            DB[IndexedDB包装器]
-        end
-        
-        subgraph “数据持久层”
-            IDB[(IndexedDB数据库)]
-        end
-    end
-    
-    subgraph “外部依赖”
-        Pyodide[Pyodide运行时<br/>Python沙箱]
-    end
-    
-    UI --> App
-    App --> LM
-    App --> GM
-    App --> AM
-    LM --> DB
-    GM --> DB
-    AM --> DB
-    DB --> IDB
-    LM --> Pyodide
-```
+<img src="架构.png" alt="架构">
 
 ### 2.2 技术栈选择
 | 层次 | 技术选型 | 版本/说明 |
 |------|----------|-----------|
 | **表示层** | HTML5, CSS3, JavaScript(ES6+) | 原生技术栈，无框架依赖 |
 | **样式框架** | 自定义CSS + 少量CSS变量 | 保持轻量，便于定制 |
-| **代码执行** | Pyodide | 0.24.1+，支持在浏览器运行Python |
-| **数据存储** | IndexedDB | 浏览器原生API |
-| **构建工具** | 无（或可选Vite） | 开发阶段可使用构建工具优化 |
+| **数据存储** | localStorage + IndexedDB | 浏览器原生API |
 | **版本控制** | Git + GitHub | 代码托管与协作 |
 
 ### 2.3 架构决策理由
 1. **纯前端架构**：项目规模适中，无多用户协作需求，IndexedDB存储容量足够（通常250MB+）。
-2. **选择Pyodide而非Skulpt**：Pyodide基于WebAssembly，支持完整的Python科学计算库，扩展性更好。
-3. **无前端框架**：项目复杂度可控，原生JS足够应对，避免框架学习成本和打包体积。
+2. **无前端框架**：项目复杂度可控，原生JS足够应对，避免框架学习成本和打包体积。
 
 ## 3. 模块详细设计
 
@@ -902,46 +860,7 @@ function migrateDatabase(oldVersion, newVersion) {
 }
 ```
 
-### 9.3 监控与维护
-1. **错误追踪**：使用Sentry或自定义错误日志
-2. **使用分析**：匿名统计功能使用频率（需用户同意）
-3. **内容更新**：通过JSON配置文件更新题目、精灵数据
-
-## 附录A：配置文件示例
-
-### 精灵配置 (pokemon.json)
-```json
-{
-  "pokemon": [
-    {
-      "id": "print_charmander",
-      "name": "打印小火龙",
-      "rarity": "COMMON",
-      "image": "assets/pokemon/charmander.gif",
-      "description": "代表print()函数，是所有Python之旅的开始",
-      "unlockCondition": "完成第1章学习"
-    },
-    {
-      "id": "function_squirtle",
-      "name": "函数杰尼龟",
-      "rarity": "COMMON",
-      "image": "assets/pokemon/squirtle.gif",
-      "description": "代表函数定义与调用，是代码复用的基础",
-      "unlockCondition": "完成第3章学习"
-    },
-    {
-      "id": "recursion_mewtwo",
-      "name": "递归超梦",
-      "rarity": "LEGENDARY",
-      "image": "assets/pokemon/mewtwo.gif",
-      "description": "代表递归思想，是编程中最强大也最难以掌握的概念之一",
-      "unlockCondition": "完成第5章且抽奖概率获得"
-    }
-  ]
-}
-```
-
-## 附录B：API接口约定（内部）
+## 附录A：API接口约定（内部）
 
 虽然是无后端应用，但模块间通过事件和Promise进行通信：
 
