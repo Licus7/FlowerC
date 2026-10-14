@@ -113,9 +113,9 @@ class CompanionSystem {
         
         // 默认陪伴精灵（皮卡丘）
         const defaultCompanion = {
-            id: 25,
-            name: '皮卡丘',
-            image: '/pokemon_gifs/25.gif',
+    id: 25,
+    name: '皮卡丘',
+    image: this.getPokemonImage(25), 
             rarity: 'common',
             type: 'electric',
             obtainedDate: new Date().toISOString()
@@ -126,17 +126,17 @@ class CompanionSystem {
     }
     
     // 设置陪伴精灵
-    setCompanion(pet) {
-        this.currentCompanion = {
-            id: pet.id,
-            name: pet.name,
-            image: pet.image || this.getPokemonImage(pet.id),
-            rarity: pet.rarity || 'common',
-            type: pet.type || 'normal',
-            selectedDate: new Date().toISOString()
-        };
-        
-        localStorage.setItem('currentCompanion', JSON.stringify(this.currentCompanion));
+   setCompanion(pet) {
+    this.currentCompanion = {
+        id: pet.id,
+        name: pet.name,
+        image: this.getPokemonImage(pet.id),   // ← 统一用函数算路径
+        rarity: pet.rarity || 'common',
+        type: pet.type || 'normal',
+        selectedDate: new Date().toISOString()
+    };
+    
+    localStorage.setItem('currentCompanion', JSON.stringify(this.currentCompanion));
         console.log(`🎯 设置陪伴精灵: ${pet.name}`);
         
         // 如果已经有显示中的精灵，更新它
@@ -292,13 +292,23 @@ class CompanionSystem {
     
     // 获取精灵图片
     getPokemonImage(id, useGif = true) {
-        const basePath = '/pokemon_gifs/';
-        
-        if (useGif) {
-            return `${basePath}${id}.gif`;
-        }
-        return `${basePath}${id}.png`;
+    // 根据当前页面路径，自动计算到 pokemon_gifs 的相对路径
+    const path = window.location.pathname;
+    let basePath;
+    
+    if (path.includes('/lottery/')) {
+        // 如果当前页面在 lottery/ 里
+        basePath = 'pokemon_gifs/';
+    } else {
+        // 如果在 start-page/ 等其他文件夹
+        basePath = '../lottery/pokemon_gifs/';
     }
+    
+    if (useGif) {
+        return `${basePath}${id}.gif`;
+    }
+    return `${basePath}${id}.png`;
+}
     
     // 获取精灵大小
     getCompanionSize() {
