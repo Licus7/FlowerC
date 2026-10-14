@@ -291,19 +291,18 @@ class CompanionSystem {
     }
     
     // 获取精灵图片
-    getPokemonImage(id, useGif = true) {
-    // 根据当前页面路径，自动计算到 pokemon_gifs 的相对路径
+   getPokemonImage(id, useGif = true) {
     const path = window.location.pathname;
     let basePath;
-    
-    if (path.includes('/lottery/')) {
-        // 如果当前页面在 lottery/ 里
-        basePath = 'pokemon_gifs/';
+
+    if (path.includes('/start-page/')) {
+        basePath = '../../pokemon_gifs/';
+    } else if (path.includes('/lottery/')) {
+        basePath = '../pokemon_gifs/';
     } else {
-        // 如果在 start-page/ 等其他文件夹
-        basePath = '../lottery/pokemon_gifs/';
+        basePath = 'pokemon_gifs/';
     }
-    
+
     if (useGif) {
         return `${basePath}${id}.gif`;
     }

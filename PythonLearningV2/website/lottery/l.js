@@ -233,7 +233,7 @@
 
     // ===== 系统常量 =====
     const LOTTERY_COST = 20;
-    const LOCAL_BASE_PATH = '/pokemon_gifs/';
+    const LOCAL_BASE_PATH = '../pokemon_gifs/';
     
     // ===== 图片获取系统 =====
     function getPokemonImage(id, useGif = true) {
@@ -467,7 +467,7 @@
         const newPet = {
             id: pet.id,
             name: pet.name,
-            image: `/pokemon_gifs/${pet.id}.gif`,  // 统一使用本地路径
+            image: `../pokemon_gifs/${pet.id}.gif`,  // 统一使用本地路径
             rarity: pet.rarity,
             type: pet.type,
             typeName: pet.typeName,
@@ -800,11 +800,11 @@ function preloadAllImages() {
     allIds.forEach(id => {
         // 预加载GIF
         const gifImg = new Image();
-        gifImg.src = `/pokemon_gifs/${id}.gif`;
+        gifImg.src = `../pokemon_gifs/${id}.gif`;
         
         // 预加载PNG作为备用
         const pngImg = new Image();
-        pngImg.src = `/pokemon_gifs/${id}.png`;
+        pngImg.src = `../pokemon_gifs/${id}.png`;
     });
     
     console.log('✅ 预加载完成');
@@ -831,11 +831,11 @@ function preloadAllImages() {
     allIds.forEach(id => {
         // 预加载GIF
         const gifImg = new Image();
-        gifImg.src = `/pokemon_gifs/${id}.gif`;
+        gifImg.src = `../pokemon_gifs/${id}.gif`;
         
         // 预加载PNG作为备用
         const pngImg = new Image();
-        pngImg.src = `/pokemon_gifs/${id}.png`;
+        pngImg.src = `../pokemon_gifs/${id}.png`;
     });
     
     console.log('✅ 预加载完成');

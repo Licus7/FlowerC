@@ -47,7 +47,7 @@
             <div class="lottery-main">
                 <div class="pet-image-container">
                     <!-- 修改为本地图片路径 -->
-                    <img id="currentPetImage" src="/pokemon_gifs/25.gif" alt="皮卡丘">
+                    <img id="currentPetImage" src="../pokemon_gifs/25.gif" alt="皮卡丘">
                 </div>
                 
                 <button id="drawButton" class="draw-btn" onclick="drawLottery()">
@@ -119,7 +119,7 @@
         const testImg = new Image();
         testImg.onload = () => console.log('✅ 本地图片能加载');
         testImg.onerror = () => console.log('❌ 本地图片加载失败');
-        testImg.src = '/pokemon_gifs/25.gif';
+        testImg.src = '../pokemon_gifs/25.gif';
         
         // 检查文件夹内容
         console.log('图片文件夹应该包含: 1.gif, 4.gif, 7.gif, 25.gif 等');
@@ -144,16 +144,16 @@
         console.log('页面加载完成，检查图片...');
         
         // 检查默认图片
-        checkImageExists('/pokemon_gifs/25.gif', function(exists) {
+        checkImageExists('../pokemon_gifs/25.gif', function(exists) {
             if (!exists) {
-                console.error('❌ /pokemon_gifs/25.gif 不存在！');
+                console.error('❌ ../pokemon_gifs/25.gif 不存在！');
                 console.log('请确保:');
                 console.log('1. pokemon_gifs 文件夹存在');
                 console.log('2. 文件夹内有 25.gif 文件');
                 console.log('3. 文件夹在正确位置（与 lottery.html 同目录）');
                 
                 // 尝试列出文件夹内容
-                fetch('/pokemon_gifs/')
+                fetch('../pokemon_gifs/')
                     .then(response => console.log('文件夹状态:', response.status))
                     .catch(err => console.log('无法访问文件夹:', err));
             } else {
