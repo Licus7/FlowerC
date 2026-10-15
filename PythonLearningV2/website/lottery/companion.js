@@ -371,9 +371,9 @@ getPokemonImage(id, useGif = true) {
         const img = this.companionElement.querySelector('img');
         if (img) {
             img.src = this.currentCompanion.image;
-            img.onerror = () => {
-                img.src = this.getPokemonImage(this.currentCompanion.id, false);
-            };
+          img.onerror = () => {
+    console.log('精灵图片加载失败:', this.currentCompanion.id);
+};
         }
         
         // 更新类名
