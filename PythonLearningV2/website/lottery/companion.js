@@ -113,9 +113,10 @@ class CompanionSystem {
         
         // 默认陪伴精灵（皮卡丘）
         const defaultCompanion = {
-    id: 25,
-    name: '皮卡丘',
-    image: this.getPokemonImage(25), 
+            id: 25,
+            name: '皮卡丘',
+            image: this.getPokemonImage(25),
+
             rarity: 'common',
             type: 'electric',
             obtainedDate: new Date().toISOString()
@@ -218,9 +219,9 @@ class CompanionSystem {
             pointer-events: none;
         `;
         
-        img.onerror = () => {
-            img.src = this.getPokemonImage(this.currentCompanion.id, false);
-        };
+       img.onerror = () => {
+    console.log('精灵图片加载失败:', this.currentCompanion.id);
+};
         
         this.companionElement.appendChild(img);
         
@@ -291,7 +292,7 @@ class CompanionSystem {
     }
     
     // 获取精灵图片
-   getPokemonImage(id, useGif = true) {
+getPokemonImage(id, useGif = true) {
     const path = window.location.pathname;
     let basePath;
 
@@ -308,7 +309,8 @@ class CompanionSystem {
     }
     return `${basePath}${id}.png`;
 }
-    
+
+
     // 获取精灵大小
     getCompanionSize() {
         const sizes = {

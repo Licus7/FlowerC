@@ -259,23 +259,11 @@
     }
     
     // 智能图片错误处理
-    function handleImageError(imgElement, id, attempt = 1) {
-        console.log(`图片加载尝试 ${attempt}: ID ${id}`);
-        
-        switch(attempt) {
-            case 1:
-                // 第一次失败：尝试PNG
-                imgElement.src = `${LOCAL_BASE_PATH}${id}.png`;
-                imgElement.onerror = () => handleImageError(imgElement, id, 2);
-                break;
-            case 2:
-                // 第二次失败：使用在线PNG
-                imgElement.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
-                imgElement.onerror = null;
-                console.warn(`精灵 ${id} 的本地图片失败，使用在线图片`);
-                break;
-        }
-    }
+   function handleImageError(imgElement, id, attempt = 1) {
+    console.log(`图片加载失败: ID ${id}`);
+    // 不要降级，直接停止
+    imgElement.onerror = null;
+}
     
     // ===== coin系统 =====
     function getCurrentCoins() {
