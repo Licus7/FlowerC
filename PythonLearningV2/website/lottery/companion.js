@@ -105,11 +105,12 @@ class CompanionSystem {
     
     // 获取当前陪伴精灵
     getCurrentCompanion() {
-        const saved = localStorage.getItem('currentCompanion');
-        if (saved) {
-            this.currentCompanion = JSON.parse(saved);
-            return this.currentCompanion;
-        }
+    const saved = localStorage.getItem('currentCompanion');
+    if (saved) {
+        this.currentCompanion = JSON.parse(saved);
+        this.currentCompanion.image = this.getPokemonImage(this.currentCompanion.id);
+        return this.currentCompanion;
+    }
         
         // 默认陪伴精灵（皮卡丘）
         const defaultCompanion = {
@@ -150,15 +151,15 @@ class CompanionSystem {
     
     // 获取可选的精灵列表
     getAvailablePets() {
-        const myPets = JSON.parse(localStorage.getItem('myPets') || '[]');
-        const currentId = this.currentCompanion?.id;
-        
-        // 标记当前选中的精灵
-        return myPets.map(pet => ({
-            ...pet,
-            isCurrent: pet.id === currentId
-        }));
-    }
+    const myPets = JSON.parse(localStorage.getItem('myPets') || '[]');
+    const currentId = this.currentCompanion?.id;
+    
+    return myPets.map(pet => ({
+        ...pet,
+        image: this.getPokemonImage(pet.id),
+        isCurrent: pet.id === currentId
+    }));
+}
     
     // 检查是否在选择页面
     isSelectionPage() {
